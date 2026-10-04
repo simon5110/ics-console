@@ -1,0 +1,209 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="900"
+             x:Class="ava.Views.PLCView"
+             xmlns:vm="using:ava.ViewModels"
+             xmlns:converters="clr-namespace:ava.Converters"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             x:DataType="vm:PLCViewModel"
+             Background="#F5F6F8">
+
+    <d:UserControl.DataContext>
+        <vm:PLCViewModel />
+    </d:UserControl.DataContext>
+
+    <UserControl.Resources>
+        <converters:BoolToBlueBrushConverter x:Key="BoolToBlue" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <!-- 选中 Tab 文字变蓝 -->
+        <Style Selector="TabItem">
+            <Setter Property="HeaderTemplate">
+                <DataTemplate x:DataType="sys:String">
+                    <TextBlock Text="{Binding}"
+                               Foreground="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}, Path=IsSelected, Converter={StaticResource BoolToBlue}}" />
+                </DataTemplate>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
+
+    <TabControl TabStripPlacement="Top" Theme="{StaticResource CardTabControl}">
+
+        <!-- ========== Modbus ========== -->
+        <TabItem Header="Modbus" Icon="{StaticResource SemiIconCloud}">
+            <Grid ColumnDefinitions="250,*" Margin="10">
+
+                <!-- ===== 左侧：正常时两卡片各占一半；高度不够时可滚动 ===== -->
+                <ScrollViewer Grid.Column="0" 
+                              VerticalScrollBarVisibility="Auto">
+                 <Grid RowDefinitions="*,*">
+
+                    <!-- 串口配置 -->
+                    <Border Grid.Row="0" Theme="{DynamicResource CardBorder}" Padding="10">
+                        <StackPanel Spacing="7">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="串口" Foreground="#666" FontSize="12" />
+                                <ComboBox HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding ComPorts}"
+                                          SelectedItem="{Binding SelectedComPort}"
+                                          PlaceholderText="请选择COM号" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="波特率" Foreground="#666" FontSize="12" />
+                                <ComboBox HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding BaudRates}"
+                                          SelectedItem="{Binding SelectedBaudRate}"
+                                          PlaceholderText="请选择波特率" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="数据位" Foreground="#666" FontSize="12" />
+                                <ComboBox HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding DataBits}"
+                                          SelectedItem="{Binding SelectedDataBit}"
+                                          PlaceholderText="请选择数据位" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="校验位" Foreground="#666" FontSize="12" />
+                                <ComboBox HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding ParityBits}"
+                                          SelectedItem="{Binding SelectedParityBit}"
+                                          PlaceholderText="请选择校验位" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="停止位" Foreground="#666" FontSize="12" />
+                                <ComboBox HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding StopBits}"
+                                          SelectedItem="{Binding SelectedStopBit}"
+                                          PlaceholderText="请选择停止位" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 能源数值输入 -->
+                    <Border Grid.Row="1"
+                            Theme="{DynamicResource CardBorder}" Padding="10">
+                        <ItemsControl ItemsSource="{Binding EnergyInputs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:EnergyInput">
+                                    <Grid ColumnDefinitions="70,*" Margin="0,3">
+                                        <TextBlock Grid.Column="0" Text="{Binding Label}"
+                                                   VerticalAlignment="Center" Foreground="#666" FontSize="12" />
+                                        <TextBox Grid.Column="1"
+                                                 Text="{Binding InputValue}"
+                                                 Watermark="请输入数值" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+
+                 </Grid>
+                </ScrollViewer>
+
+                <!-- ===== 右侧 ===== -->
+                <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="10,0,0,0">
+
+                    <!-- 8 个能源卡片（2行4列） -->
+                    <ItemsControl Grid.Row="0" ItemsSource="{Binding EnergyCards}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="2" Columns="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:EnergyCard">
+                                <Border Theme="{DynamicResource CardBorder}"
+                                        Padding="12" Margin="5">
+                                    <Grid ColumnDefinitions="Auto,*">
+
+                                        <!-- 矢量图标 -->
+                                        <Border Grid.Column="0" Width="48" Height="72"
+                                                CornerRadius="8" Background="#5B8FF9">
+                                            <Path Data="{Binding IconGeometry}"
+                                                  Fill="White"
+                                                  Width="28" Height="28"
+                                                  Stretch="Uniform"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                                        </Border>
+
+                                        <!-- 信息 -->
+                                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                            <TextBlock Text="{Binding Name}"
+                                                       Foreground="#666" FontSize="12" />
+                                            <TextBlock Text="{Binding TodayValue}"
+                                                       FontSize="26" FontWeight="Bold"
+                                                       Margin="0,4" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="较昨日上升 "
+                                                           Foreground="#999" FontSize="12" />
+                                                <TextBlock Text="{Binding YesterdayDelta}"
+                                                           Foreground="#333" FontSize="12" />
+                                            </StackPanel>
+                                            <Grid Margin="0,10,0,0">
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Left">
+                                                    <TextBlock Text="本月用量: "
+                                                               Foreground="#999" FontSize="12" />
+                                                    <TextBlock Text="{Binding MonthValue}"
+                                                               FontSize="12" />
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Right">
+                                                    <TextBlock Text="上月用量: "
+                                                               Foreground="#999" FontSize="12" />
+                                                    <TextBlock Text="{Binding LastMonthValue}"
+                                                               FontSize="12" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- 耗量对比图：柱状图 + 折线图 -->
+                    <Border Grid.Row="1" Theme="{DynamicResource CardBorder}"
+                            Padding="15" Margin="5,10,5,5">
+                        <Grid RowDefinitions="Auto,*">
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="耗量对比图"
+                                           FontSize="20" FontWeight="Bold"
+                                           HorizontalAlignment="Center" />
+                                <!-- 右上角导出/分享 -->
+                                <Path Width="22" Height="22"
+                                      Fill="#555" Stretch="Uniform"
+                                      HorizontalAlignment="Right"
+                                      Data="M10.59,14.83L14.17,18.41L18.41,14.17L14.83,10.59M13.2,3A9,9 0 0,0 4.2,12A9,9 0 0,0 13.2,21A9,9 0 0,0 22.2,12H20.2A7,7 0 0,1 13.2,19A7,7 0 0,1 6.2,12A7,7 0 0,1 13.2,5A6.91,6.91 0 0,1 18.14,7.86L15.5,10.5H22.5V3.5L19.92,6.08A8.93,8.93 0 0,0 13.2,3Z" />
+                            </Grid>
+                            <lvc:CartesianChart Grid.Row="1"
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}" />
+                        </Grid>
+                    </Border>
+
+                </Grid>
+            </Grid>
+        </TabItem>
+
+        <!-- ========== 西门子 ========== -->
+        <TabItem Header="西门子" Icon="{StaticResource SemiIconDesktop}">
+            <TextBlock Text="西门子（待开发）" Margin="20" />
+        </TabItem>
+
+     
+        <!-- ========== 欧姆龙 ========== -->
+        <TabItem Header="欧姆龙" Icon="{StaticResource SemiIconConnectionPoint1}">
+            <TextBlock Text="欧姆龙（待开发）" Margin="20" />
+        </TabItem>
+
+    </TabControl>
+
+</UserControl>

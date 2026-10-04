@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             xmlns:vm="using:ava.ViewModels"
+             xmlns:myControls="clr-namespace:ava.MyControls"
+             x:DataType="vm:HomeViewModel"
+             xmlns:u="https://irihi.tech/ursa"
+             x:Class="ava.Views.HomeView">
+
+    <!-- 设计时 DataContext：只在 IDE 预览器生效，运行时忽略，不会重复创建 ViewModel -->
+    <d:UserControl.DataContext>
+        <vm:HomeViewModel></vm:HomeViewModel>
+    </d:UserControl.DataContext>
+
+    <Grid RowDefinitions="150,*,Auto">
+
+        <ItemsControl Grid.Row="0" ItemsSource="{Binding DeviceItems}" Margin="0,0,0,10">
+            <!-- ItemsPanel：指定内部布局为 UniformGrid，2列 -->
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="3" ColumnSpacing="10" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <!-- 循环模板，每一项渲染你的圆形进度条 -->
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="20" Grid.Column="0" CornerRadius="10" Background="#fff">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Border Grid.Column="0" Margin="0,0,10,0">
+                                <StackPanel VerticalAlignment="Center">
+                                    <Image Width="50" Height="50" HorizontalAlignment="Left"
+                                           Source="{Binding DeviceImg}">
+                                    </Image>
+                                    <TextBlock Text="{Binding DeviceName}" Margin="0,10" FontSize="18"
+                                               FontWeight="Bold">
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding DeviceNameSub}" Foreground="Gray"></TextBlock>
+                                </StackPanel>
+                            </Border>
+                            <myControls:CircleProgress
+                                Margin="0 10"
+                                Width="100"
+                                Grid.Column="1"
+                                Height="100"
+                                Minimum="0"
+                                Maximum="100"
+                                Value="{Binding Value}"
+                                ShowProgressText="True"
+                                StrokeThickness="15"
+                                Foreground="#409EFF"
+                                BackgroundRing="#E5E6EB"
+                                TextColor="#303133" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- 表格数据列表 -->
+        <DataGrid
+                Grid.Row="1" 
+                ItemsSource="{Binding DeviceRealTimeBjList}">
+                <DataGrid.Styles>
+                    <!-- <Style Selector="DataGridRow"> -->
+                    <!--     <Setter Property="Header"  Value="{Binding $self.Index}" /> -->
+                    <!-- </Style> -->
+                </DataGrid.Styles>
+            
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="序号" Width="60" CanUserSort="False" Binding="{Binding Index}" />
+                    
+                    <DataGridTextColumn
+                        Width="*"
+                        x:DataType="vm:DeviceRealTimeBj"
+                        Binding="{Binding BjDeviceName}"
+                        Header="报警设备" />
+                    <DataGridTextColumn
+                        Width="*"
+                        x:DataType="vm:DeviceRealTimeBj"
+                        Binding="{Binding BjArg}"
+                        Header="报警变量" />
+                    <DataGridTextColumn
+                        Width="150"
+                        x:DataType="vm:DeviceRealTimeBj"
+                        Binding="{Binding BjNum}"
+                        Header="报警数值" />
+                    <DataGridTextColumn
+                        Width="150"
+                        x:DataType="vm:DeviceRealTimeBj"
+                        Binding="{Binding BjType}"
+                        Header="报警类型" />
+                    <DataGridTextColumn
+                        Width="150"
+                        x:DataType="vm:DeviceRealTimeBj"
+                        Binding="{Binding BjYz}"
+                        Header="报警阈值" />
+                    <DataGridTextColumn
+                        Width="150"
+                        x:DataType="vm:DeviceRealTimeBj"
+                        Binding="{Binding BjLevel}"
+                        Header="报警等级" />
+                    <DataGridTemplateColumn Header="报警时间" SortMemberPath="BjTime">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="16,0"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding BjTime}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+
+        <u:Pagination
+            Grid.Row="2"
+            Name="page"
+            PageSizeOptions="10, 20, 50, 100"
+            CurrentPage="{Binding CurrentPage, Mode=TwoWay}"
+            PageSize="{Binding PageSize, Mode=TwoWay}"
+            ShowQuickJump="True"
+            ShowPageSizeSelector="True"
+            Command="{Binding LoadPageCommand}"
+            CommandParameter="{Binding $self.CurrentPage}"
+            TotalCount="{Binding TotalCount}" />
+    </Grid>
+
+
+</UserControl>

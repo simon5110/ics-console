@@ -1,0 +1,380 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        凿岩台车 ICS 控制台设计系统
+        =====================
+        深色工业风：深蓝黑底 + 青蓝主色 + 状态色（绿/琥珀/红）
+        所有页面共用：卡片、标题、指标、状态标签、按钮、底部导航
+    -->
+    <Styles.Resources>
+        <!-- ===== 色板 ===== -->
+        <Color x:Key="JumboBgColor">#070C11</Color>
+        <SolidColorBrush x:Key="JumboBg" Color="#070C11" />
+        <SolidColorBrush x:Key="JumboBgSoft" Color="#0A1218" />
+        <SolidColorBrush x:Key="JumboPanel" Color="#0E1720" />
+        <SolidColorBrush x:Key="JumboPanelHi" Color="#13212C" />
+        <SolidColorBrush x:Key="JumboStroke" Color="#1D2E3B" />
+        <SolidColorBrush x:Key="JumboStrokeHi" Color="#2E4E66" />
+        <SolidColorBrush x:Key="JumboAccent" Color="#23A9F0" />
+        <SolidColorBrush x:Key="JumboAccentDeep" Color="#0E5F8F" />
+        <SolidColorBrush x:Key="JumboAccentSoft" Color="#3323A9F0" />
+        <SolidColorBrush x:Key="JumboCyan" Color="#2EE6D6" />
+        <SolidColorBrush x:Key="JumboGreen" Color="#2AD07C" />
+        <SolidColorBrush x:Key="JumboAmber" Color="#F5A623" />
+        <SolidColorBrush x:Key="JumboRed" Color="#ED4C5C" />
+        <SolidColorBrush x:Key="JumboViolet" Color="#9B8CFF" />
+        <SolidColorBrush x:Key="JumboText" Color="#E9F5FC" />
+        <SolidColorBrush x:Key="JumboSub" Color="#90A9B9" />
+        <SolidColorBrush x:Key="JumboDim" Color="#5C7484" />
+        <SolidColorBrush x:Key="JumboTrack" Color="#14222C" />
+
+        <!-- 窗口背景渐变 -->
+        <RadialGradientBrush x:Key="JumboBackground" Center="0.6,0" RadiusX="1.1" RadiusY="1.2" GradientOrigin="0.6,0">
+            <GradientStop Offset="0" Color="#12222E" />
+            <GradientStop Offset="0.45" Color="#0A1319" />
+            <GradientStop Offset="1" Color="#070C11" />
+        </RadialGradientBrush>
+
+        <!-- ===== 按钮 ===== -->
+        <ControlTheme x:Key="JumboButton" TargetType="Button">
+            <Setter Property="Background" Value="#12212C" />
+            <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8"
+                            Padding="{TemplateBinding Padding}"
+                            TextElement.Foreground="{TemplateBinding Foreground}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#1A3040" />
+                <Setter Property="BorderBrush" Value="{DynamicResource JumboStrokeHi}" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#Root">
+                <Setter Property="Background" Value="#0C1A24" />
+            </Style>
+            <Style Selector="^:disabled">
+                <Setter Property="Opacity" Value="0.4" />
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="JumboPrimaryButton" TargetType="Button" BasedOn="{StaticResource JumboButton}">
+            <Setter Property="Background" Value="{DynamicResource JumboAccent}" />
+            <Setter Property="BorderBrush" Value="#3DBCFF" />
+            <Setter Property="Foreground" Value="#04121B" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#4CBBF8" />
+                <Setter Property="BorderBrush" Value="#7FD2FF" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#Root">
+                <Setter Property="Background" Value="#1189C9" />
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="JumboDangerButton" TargetType="Button" BasedOn="{StaticResource JumboButton}">
+            <Setter Property="Background" Value="#2A1216" />
+            <Setter Property="BorderBrush" Value="#6B2029" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboRed}" />
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#3D161C" />
+                <Setter Property="BorderBrush" Value="{DynamicResource JumboRed}" />
+            </Style>
+        </ControlTheme>
+
+        <!-- ===== 底部导航项 ===== -->
+        <ControlTheme x:Key="JumboNavItem" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Margin" Value="1,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Root" Background="{TemplateBinding Background}" CornerRadius="10" Padding="13,6">
+                        <StackPanel Spacing="5" HorizontalAlignment="Center">
+                            <Path Name="Ico" Data="{ReflectionBinding Icon}" Width="21" Height="21" Stretch="Uniform"
+                                  Fill="{DynamicResource JumboDim}" HorizontalAlignment="Center" />
+                            <TextBlock Name="Lbl" Text="{ReflectionBinding Header}" FontSize="14"
+                                       Foreground="{DynamicResource JumboSub}" HorizontalAlignment="Center" />
+                            <Border Name="Bar" Height="3" Width="0" CornerRadius="2"
+                                    Background="{DynamicResource JumboAccent}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#101D26" />
+            </Style>
+            <Style Selector="^:selected /template/ Border#Root">
+                <Setter Property="Background" Value="#12232E" />
+            </Style>
+            <Style Selector="^:selected /template/ Path#Ico">
+                <Setter Property="Fill" Value="{DynamicResource JumboAccent}" />
+            </Style>
+            <Style Selector="^:selected /template/ TextBlock#Lbl">
+                <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+            <Style Selector="^:selected /template/ Border#Bar">
+                <Setter Property="Width" Value="22" />
+            </Style>
+        </ControlTheme>
+
+        <!-- ===== 设置项行 ===== -->
+        <ControlTheme x:Key="JumboSettingRow" TargetType="ContentControl">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <!-- ===== 列表行（告警 / 信号） ===== -->
+        <ControlTheme x:Key="JumboRowItem" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Root" CornerRadius="8" Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#101C25" />
+            </Style>
+            <Style Selector="^:selected /template/ Border#Root">
+                <Setter Property="Background" Value="#13242F" />
+                <Setter Property="BoxShadow" Value="inset 2 0 0 0 #23A9F0" />
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="JumboListBase" TargetType="ListBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8" Padding="{TemplateBinding Padding}">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsPresenter Name="PART_ItemsPresenter"
+                                            ItemsPanel="{TemplateBinding ItemsPanel}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <ControlTheme x:Key="JumboList" TargetType="ListBox" BasedOn="{StaticResource JumboListBase}">
+            <Setter Property="ItemContainerTheme" Value="{StaticResource JumboRowItem}" />
+        </ControlTheme>
+
+        <ControlTheme x:Key="JumboNavList" TargetType="ListBox" BasedOn="{StaticResource JumboListBase}">
+            <Setter Property="ItemContainerTheme" Value="{StaticResource JumboNavItem}" />
+            <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center" />
+                </ItemsPanelTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <!-- ===== 胶囊选择项（臂架/模式切换） ===== -->
+        <ControlTheme x:Key="JumboPillItem" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="#12212C" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Root" Background="{TemplateBinding Background}" CornerRadius="9"
+                            Padding="18,7" TextElement.Foreground="{TemplateBinding Foreground}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#1A3040" />
+            </Style>
+            <Style Selector="^:selected">
+                <Setter Property="Background" Value="{DynamicResource JumboAccent}" />
+                <Setter Property="Foreground" Value="#04121B" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="JumboPillList" TargetType="ListBox" BasedOn="{StaticResource JumboListBase}">
+            <Setter Property="ItemContainerTheme" Value="{StaticResource JumboPillItem}" />
+            <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="6" />
+                </ItemsPanelTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <ControlTheme x:Key="JumboPillItemCompact" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="#12212C" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Root" Background="{TemplateBinding Background}" CornerRadius="8"
+                            Padding="11,6" TextElement.Foreground="{TemplateBinding Foreground}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#1A3040" />
+            </Style>
+            <Style Selector="^:selected">
+                <Setter Property="Background" Value="{DynamicResource JumboAccent}" />
+                <Setter Property="Foreground" Value="#04121B" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="JumboPillCompact" TargetType="ListBox" BasedOn="{StaticResource JumboListBase}">
+            <Setter Property="ItemContainerTheme" Value="{StaticResource JumboPillItemCompact}" />
+            <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="4" />
+                </ItemsPanelTemplate>
+            </Setter>
+        </ControlTheme>
+    </Styles.Resources>
+
+    <!-- ===== 卡片 ===== -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{DynamicResource JumboPanel}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="16" />
+    </Style>
+    <Style Selector="Border.card.flat">
+        <Setter Property="Background" Value="{DynamicResource JumboBgSoft}" />
+    </Style>
+    <Style Selector="Border.card.hi">
+        <Setter Property="BorderBrush" Value="{DynamicResource JumboAccentDeep}" />
+        <Setter Property="BoxShadow" Value="0 0 24 0 #331C7FB0" />
+    </Style>
+    <Style Selector="Border.card.alarm">
+        <Setter Property="BorderBrush" Value="#5A2029" />
+        <Setter Property="Background" Value="#150F13" />
+    </Style>
+
+    <!-- ===== 文本 ===== -->
+    <Style Selector="TextBlock.page-title">
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+    </Style>
+    <Style Selector="TextBlock.section">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+    </Style>
+    <Style Selector="TextBlock.card-title">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+    </Style>
+    <Style Selector="TextBlock.sub">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboDim}" />
+    </Style>
+    <Style Selector="TextBlock.metric">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+    </Style>
+    <Style Selector="TextBlock.metric-sm">
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+    </Style>
+    <Style Selector="TextBlock.mono">
+        <Setter Property="FontFamily" Value="Consolas, Menlo, monospace" />
+    </Style>
+
+    <!-- ===== 状态标签 ===== -->
+    <Style Selector="Border.tag">
+        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="Padding" Value="7,2" />
+        <Setter Property="Background" Value="#15242E" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.tag TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+    </Style>
+    <Style Selector="Border.tag.ok">
+        <Setter Property="Background" Value="#0E2A20" />
+        <Setter Property="BorderBrush" Value="#1F5A42" />
+    </Style>
+    <Style Selector="Border.tag.ok TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource JumboGreen}" />
+    </Style>
+    <Style Selector="Border.tag.warn">
+        <Setter Property="Background" Value="#2A2110" />
+        <Setter Property="BorderBrush" Value="#5C4718" />
+    </Style>
+    <Style Selector="Border.tag.warn TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource JumboAmber}" />
+    </Style>
+    <Style Selector="Border.tag.bad">
+        <Setter Property="Background" Value="#2A1216" />
+        <Setter Property="BorderBrush" Value="#5A2029" />
+    </Style>
+    <Style Selector="Border.tag.bad TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource JumboRed}" />
+    </Style>
+    <Style Selector="Border.tag.info TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource JumboAccent}" />
+    </Style>
+    <Style Selector="Border.tag.info">
+        <Setter Property="Background" Value="#0F2431" />
+        <Setter Property="BorderBrush" Value="#1B4A63" />
+    </Style>
+
+    <!-- ===== 分隔线 ===== -->
+    <Style Selector="Border.hr">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource JumboStroke}" />
+        <Setter Property="Margin" Value="0,10" />
+    </Style>
+
+    <!-- ===== 键值行 ===== -->
+    <Style Selector="Grid.kv TextBlock.key">
+        <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+</Styles>

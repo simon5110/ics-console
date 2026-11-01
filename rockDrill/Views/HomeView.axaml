@@ -1,0 +1,294 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             xmlns:myControls="clr-namespace:rockDrill.MyControls"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.HomeView"
+             x:DataType="vm:HomeViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.stat-lbl">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboDim}" />
+        </Style>
+        <Style Selector="TextBlock.stat-val">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="作业总览" />
+                <TextBlock Classes="sub" Text="{Binding FaceText}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag ok"><TextBlock Text="{Binding ScanStateText}" /></Border>
+                <Border Classes="tag ok"><TextBlock Text="{Binding CalibStateText}" /></Border>
+                <Border Classes="tag info"><TextBlock Text="{Binding AutoStateText}" /></Border>
+                <Border Classes="tag"><TextBlock Text="{Binding ShiftText}" /></Border>
+                <Border Classes="tag"><TextBlock Text="{Binding OperatorText}" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" RowDefinitions="1.04*,*" RowSpacing="12">
+
+            <!-- ============ 第一行：进度 / 双臂 / 设备 ============ -->
+            <Grid Grid.Row="0" ColumnDefinitions="1.08*,1.55*,1.05*" ColumnSpacing="12">
+
+                <!-- 本循环进度 -->
+                <Border Grid.Column="0" Classes="card">
+                    <Grid RowDefinitions="Auto,*,Auto">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="本循环进度" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Classes="tag info"><TextBlock Text="{Binding CycleText}" /></Border>
+                        </Grid>
+
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,10,0,6">
+                            <myControls:CircleProgress Width="146" Height="146" StrokeThickness="11"
+                                                       Value="{Binding RoundProgress}"
+                                                       Foreground="{DynamicResource JumboAccent}"
+                                                       BackgroundRing="{DynamicResource JumboTrack}"
+                                                       TextColor="{DynamicResource JumboText}"
+                                                       VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Spacing="13" VerticalAlignment="Center" Margin="16,0,0,0">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="stat-lbl" Text="已完成炮孔" />
+                                    <StackPanel Orientation="Horizontal" Spacing="3">
+                                        <TextBlock Classes="stat-val" Text="{Binding DoneHoles}" FontSize="21" />
+                                        <TextBlock Classes="dim" Text="/" VerticalAlignment="Bottom" Margin="0,0,2,2" />
+                                        <TextBlock Classes="dim" Text="{Binding TotalHoles}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                                        <TextBlock Classes="dim" Text="个" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="stat-lbl" Text="本循环进尺" />
+                                    <TextBlock Classes="stat-val" Text="{Binding FootageText}" />
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="stat-lbl" Text="循环耗时预估" />
+                                    <TextBlock Classes="stat-val" Text="{Binding RemainText}" FontSize="15" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Grid.Row="2" Classes="flat" Background="#0B151D" CornerRadius="8" Padding="10,8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Ellipse Width="7" Height="7" Fill="{DynamicResource JumboGreen}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="当前工步：左臂钻入 No.62 孔 / 右臂退钎" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- 双臂作业态势 -->
+                <Border Grid.Column="1" Classes="card">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="双臂作业态势" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Border Classes="tag"><TextBlock Text="协同钻孔" /></Border>
+                                <Border Classes="tag"><TextBlock Text="防碰撞 已启用" /></Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Booms}" Margin="0,12,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="2" ColumnSpacing="10" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:BoomVm">
+                                    <Border Background="#0F1B24" BorderBrush="{DynamicResource JumboStroke}"
+                                            BorderThickness="1" CornerRadius="10" Padding="14">
+                                        <StackPanel Spacing="11" VerticalAlignment="Center">
+                                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                                <Ellipse Width="8" Height="8" Fill="{Binding StateBrush}" VerticalAlignment="Center" />
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" Margin="8,0,0,0">
+                                                    <TextBlock Classes="section" Text="{Binding Name}" />
+                                                    <TextBlock Classes="dim" Text="{Binding SubName}" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                                <Border Grid.Column="2" Classes="tag ok">
+                                                    <TextBlock Text="{Binding State}" />
+                                                </Border>
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="*,*,*">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Classes="stat-lbl" Text="当前孔号" />
+                                                    <TextBlock Classes="stat-val" Text="{Binding HoleText}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Spacing="2">
+                                                    <TextBlock Classes="stat-lbl" Text="单孔进尺" />
+                                                    <TextBlock Classes="stat-val" Text="{Binding DepthText}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Spacing="2">
+                                                    <TextBlock Classes="stat-lbl" Text="累计进尺" />
+                                                    <TextBlock Classes="stat-val" Text="{Binding TotalText}" />
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <ItemsControl ItemsSource="{Binding Axes}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:AxisVm">
+                                                        <Grid ColumnDefinitions="66,*,52" Margin="0,4,0,0">
+                                                            <TextBlock Classes="stat-lbl" Text="{Binding Label}" VerticalAlignment="Center" />
+                                                            <myControls:LevelBar Grid.Column="1" Height="6" Margin="0,0,8,0"
+                                                                                 Value="{Binding Percent}" Maximum="100"
+                                                                                 FillBrush="{Binding Brush}" VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="2" Text="{Binding ValueText}" FontSize="13"
+                                                                       Foreground="{DynamicResource JumboSub}"
+                                                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+
+                <!-- 整机状态 -->
+                <Border Grid.Column="2" Classes="card">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="整机状态" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Classes="tag ok"><TextBlock Text="运行正常" /></Border>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Devices}" Margin="0,8,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:DeviceVm">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,7,0,7">
+                                        <Ellipse Width="6" Height="6" Fill="{Binding DotBrush}" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" Spacing="5" Margin="9,0,10,0">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock Text="{Binding Name}" FontSize="14"
+                                                           Foreground="{DynamicResource JumboSub}" />
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3">
+                                                    <TextBlock Text="{Binding ValueText}" FontSize="15" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource JumboText}" />
+                                                    <TextBlock Text="{Binding Unit}" FontSize="12"
+                                                               Foreground="{DynamicResource JumboDim}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                                                </StackPanel>
+                                            </Grid>
+                                            <myControls:LevelBar Height="4" Value="{Binding Percent}" Maximum="100"
+                                                                 FillBrush="{DynamicResource JumboAccentDeep}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ============ 第二行：实时参数 / 最近告警 ============ -->
+            <Grid Grid.Row="1" ColumnDefinitions="1.62*,1*" ColumnSpacing="12">
+
+                <Border Grid.Column="0" Classes="card">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Classes="card-title" Text="钻进实时参数" VerticalAlignment="Center" />
+                                <Border Classes="tag info"><TextBlock Text="左臂 BOOM-A" /></Border>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Classes="dim" Text="刷新周期 800ms" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Metrics}" Margin="0,12,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" Rows="2" ColumnSpacing="10" RowSpacing="10" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MetricVm">
+                                    <Border Background="#101C25" BorderBrush="{DynamicResource JumboStroke}"
+                                            BorderThickness="1" CornerRadius="9" Padding="12,10">
+                                        <StackPanel Spacing="6" VerticalAlignment="Center">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock Text="{Binding Label}" FontSize="14"
+                                                           Foreground="{DynamicResource JumboSub}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Unit}" FontSize="12"
+                                                           Foreground="{DynamicResource JumboDim}" />
+                                            </Grid>
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock Text="{Binding Display}" FontSize="22" FontWeight="Bold"
+                                                           FontFamily="Consolas, Menlo, monospace"
+                                                           Foreground="{DynamicResource JumboText}" />
+                                            </StackPanel>
+                                            <myControls:LevelBar Height="6"
+                                                                 Value="{Binding Value}"
+                                                                 Minimum="{Binding Minimum}"
+                                                                 Maximum="{Binding Maximum}"
+                                                                 Target="{Binding Target}"
+                                                                 FillBrush="{Binding Brush}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                    <Grid RowDefinitions="Auto,*,Auto">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Classes="card-title" Text="最近告警" VerticalAlignment="Center" />
+                                <Border Classes="tag bad"><TextBlock Text="3 条" /></Border>
+                            </StackPanel>
+                            <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Padding="10,4" FontSize="13"
+                                    Content="查看全部" />
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding RecentAlarms}" Margin="0,10,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:AlarmVm">
+                                    <Border Background="#101C25" CornerRadius="8" Padding="10,9" Margin="0,0,0,8">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Border Width="3" CornerRadius="2" Background="{Binding Brush}" Margin="0,1,10,1" />
+                                            <StackPanel Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="{Binding Message}" FontSize="14.5"
+                                                           Foreground="{DynamicResource JumboText}" TextWrapping="Wrap" />
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock Text="{Binding Code}" FontSize="12.5"
+                                                               FontFamily="Consolas, Menlo, monospace"
+                                                               Foreground="{DynamicResource JumboDim}" />
+                                                    <TextBlock Text="{Binding Source}" FontSize="12.5"
+                                                               Foreground="{DynamicResource JumboDim}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" Spacing="3" HorizontalAlignment="Right">
+                                                <TextBlock Text="{Binding Time}" FontSize="12.5"
+                                                           FontFamily="Consolas, Menlo, monospace"
+                                                           Foreground="{DynamicResource JumboSub}" HorizontalAlignment="Right" />
+                                                <TextBlock Text="{Binding Level}" FontSize="12.5"
+                                                           Foreground="{Binding Brush}" HorizontalAlignment="Right" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Grid.Row="2" Background="#0B151D" CornerRadius="8" Padding="10,7">
+                            <TextBlock Classes="dim" Text="提示：连续 3 次压力异常将触发自动停机保护" />
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

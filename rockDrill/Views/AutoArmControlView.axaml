@@ -1,0 +1,233 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.AutoArmControlView"
+             x:DataType="vm:AutoArmControlViewModel">
+
+    <UserControl.Styles>
+        <!-- 左右臂切换按钮 -->
+        <Style Selector="Button.seg">
+            <Setter Property="Theme" Value="{StaticResource JumboButton}" />
+            <Setter Property="Padding" Value="15,6" />
+            <Setter Property="FontSize" Value="12.5" />
+        </Style>
+        <Style Selector="Button.seg.on">
+            <Setter Property="Background" Value="{DynamicResource JumboAccent}" />
+            <Setter Property="BorderBrush" Value="#3DBCFF" />
+            <Setter Property="Foreground" Value="#04121B" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- 表格单元格 -->
+        <Style Selector="TextBlock.th">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboDim}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+
+        <!-- 输入控件深色化 -->
+        <Style Selector="NumericUpDown">
+            <Setter Property="Background" Value="#0B151D" />
+            <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="#0B151D" />
+            <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="自动控臂 · ZeroMQ" />
+                <TextBlock Classes="sub" Text="7 组比例阀 · 开度 0–100 · 目标读数到位即停 · PID 低开度试探与位置保持" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag" Padding="5">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Button Classes="seg" Classes.on="{Binding IsLeftArm}" Content="左臂"
+                                Command="{Binding SelectArmCommand}" CommandParameter="L" />
+                        <Button Classes="seg" Classes.on="{Binding IsRightArm}" Content="右臂"
+                                Command="{Binding SelectArmCommand}" CommandParameter="R" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="tag ok" IsVisible="{Binding ConnectionOk}">
+                    <TextBlock Text="发布通道已连接" />
+                </Border>
+                <Border Classes="tag warn" IsVisible="{Binding !ConnectionOk}">
+                    <TextBlock Text="发布通道未就绪" />
+                </Border>
+
+                <Button Theme="{StaticResource JumboDangerButton}" Content="全部急停"
+                        Padding="18,8" FontSize="13.5" FontWeight="SemiBold"
+                        Command="{Binding EmergencyStopCommand}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- ================= 提示条 ================= -->
+        <Border Grid.Row="1" Classes="card flat" Padding="12,9" IsVisible="{Binding HasNotice}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="●" FontSize="12" Foreground="{Binding NoticeBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding NoticeText}" Foreground="{Binding NoticeBrush}"
+                           FontSize="12.5" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- ================= 阀门控制表 ================= -->
+        <Border Grid.Row="2" Classes="card">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                <!-- 表头 -->
+                <Grid ColumnDefinitions="1.45*,0.95*,1.45*,0.95*,1.15*,1.05*,2*,1.5*,1.25*" Margin="0,0,0,6">
+                    <TextBlock Grid.Column="0" Classes="th" Text="方向 A" />
+                    <TextBlock Grid.Column="1" Classes="th" Text="开度 %" />
+                    <TextBlock Grid.Column="2" Classes="th" Text="方向 B" />
+                    <TextBlock Grid.Column="3" Classes="th" Text="开度 %" />
+                    <TextBlock Grid.Column="4" Classes="th" Text="目标读数（可选）" />
+                    <TextBlock Grid.Column="5" Classes="th" Text="当前读数" />
+                    <TextBlock Grid.Column="6" Classes="th" Text="状态" />
+                    <TextBlock Grid.Column="7" Classes="th" Text="执行" />
+                    <TextBlock Grid.Column="8" Classes="th" Text="停止 / PID 保持" />
+                </Grid>
+
+                <Border Grid.Row="1" Classes="hr" />
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ValveRowVm">
+                                <Border BorderBrush="{DynamicResource JumboStroke}" BorderThickness="0,0,0,1"
+                                        Padding="0,8">
+                                    <Grid ColumnDefinitions="1.45*,0.95*,1.45*,0.95*,1.15*,1.05*,2*,1.5*,1.25*"
+                                          VerticalAlignment="Center">
+
+                                        <!-- 方向 A -->
+                                        <TextBlock Grid.Column="0" Text="{Binding NameA}" FontSize="13"
+                                                   Foreground="{DynamicResource JumboText}"
+                                                   VerticalAlignment="Center" />
+
+                                        <!-- 开度 A -->
+                                        <NumericUpDown Grid.Column="1" Margin="4,0"
+                                                       Value="{Binding OpenA, Mode=TwoWay}"
+                                                       Minimum="0" Maximum="100" Increment="1"
+                                                       ShowButtonSpinner="False"
+                                                       HorizontalContentAlignment="Right"
+                                                       FontSize="13" Padding="8,5"
+                                                       IsEnabled="{Binding InputsEnabled}" />
+
+                                        <!-- 方向 B -->
+                                        <TextBlock Grid.Column="2" Text="{Binding NameB}" FontSize="13"
+                                                   Foreground="{DynamicResource JumboText}"
+                                                   VerticalAlignment="Center" />
+
+                                        <!-- 开度 B -->
+                                        <NumericUpDown Grid.Column="3" Margin="4,0"
+                                                       Value="{Binding OpenB, Mode=TwoWay}"
+                                                       Minimum="0" Maximum="100" Increment="1"
+                                                       ShowButtonSpinner="False"
+                                                       HorizontalContentAlignment="Right"
+                                                       FontSize="13" Padding="8,5"
+                                                       IsEnabled="{Binding InputsEnabled}" />
+
+                                        <!-- 目标读数 -->
+                                        <TextBox Grid.Column="4" Margin="4,0"
+                                                 Text="{Binding TargetText, Mode=TwoWay}"
+                                                 PlaceholderText="可留空" TextAlignment="Right"
+                                                 FontSize="13" Padding="8,6" MinHeight="0"
+                                                 IsEnabled="{Binding InputsEnabled}" />
+
+                                        <!-- 当前读数 -->
+                                        <TextBlock Grid.Column="5" Text="{Binding CurrentText}"
+                                                   FontSize="13.5" FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{DynamicResource JumboCyan}"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                   Margin="0,0,8,0" />
+
+                                        <!-- 状态 -->
+                                        <TextBlock Grid.Column="6" Text="{Binding StatusText}"
+                                                   FontSize="12.5" TextTrimming="CharacterEllipsis"
+                                                   Foreground="{Binding StatusBrush}"
+                                                   VerticalAlignment="Center" Margin="2,0,8,0" />
+
+                                        <!-- 启动 / 停止 -->
+                                        <Grid Grid.Column="7" ColumnDefinitions="*,*" ColumnSpacing="6"
+                                              Margin="0,0,6,0">
+                                            <Button Grid.Column="0" Theme="{StaticResource JumboButton}"
+                                                    Content="启动" Command="{Binding StartCommand}"
+                                                    IsEnabled="{Binding StartEnabled}"
+                                                    Padding="0,6" FontSize="12.5"
+                                                    HorizontalAlignment="Stretch" />
+                                            <Button Grid.Column="1" Theme="{StaticResource JumboDangerButton}"
+                                                    Content="停止" Command="{Binding StopCommand}"
+                                                    IsEnabled="{Binding StopEnabled}"
+                                                    Padding="0,6" FontSize="12.5"
+                                                    HorizontalAlignment="Stretch" />
+                                        </Grid>
+
+                                        <!-- PID 保持 -->
+                                        <Button Grid.Column="8" Theme="{StaticResource JumboButton}"
+                                                Content="PID 保持" Command="{Binding PidCommand}"
+                                                IsEnabled="{Binding PidEnabled}"
+                                                Padding="0,6" FontSize="12.5"
+                                                HorizontalAlignment="Stretch" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- 联锁与安全说明 -->
+                <StackPanel Grid.Row="3" Spacing="12" Margin="0,14,0,0">
+                    <Border Classes="hr" />
+                    <UniformGrid Columns="3">
+                        <StackPanel Spacing="4" Margin="0,0,18,0">
+                            <TextBlock Classes="card-title" Text="控制联锁" FontSize="12.5" />
+                            <TextBlock Classes="dim" FontSize="11.5" TextWrapping="Wrap"
+                                       Text="同一组 A / B 方向不能同时打开；PID 保持期间禁止启动其他阀门；已有阀门运行时禁止并行启动 PID 试探。" />
+                        </StackPanel>
+                        <StackPanel Spacing="4" Margin="0,0,18,0">
+                            <TextBlock Classes="card-title" Text="数据超时" FontSize="12.5" />
+                            <TextBlock Classes="dim" FontSize="11.5" TextWrapping="Wrap"
+                                       Text="启动前必须收到该通道 0.5 秒内的有效反馈；运行中一旦超时立即全部置零并停止发布。" />
+                        </StackPanel>
+                        <StackPanel Spacing="4">
+                            <TextBlock Classes="card-title" Text="PID 策略" FontSize="12.5" />
+                            <TextBlock Classes="dim" FontSize="11.5" TextWrapping="Wrap"
+                                       Text="由 1% 开度逐级试探确认运动方向与增益，再转入位置保持；保持误差超过 2.0 自动停止。" />
+                        </StackPanel>
+                    </UniformGrid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ================= 页脚 ================= -->
+        <StackPanel Grid.Row="3" Spacing="4">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="●" FontSize="11" Foreground="{DynamicResource JumboGreen}"
+                           IsVisible="{Binding SensorOk}" VerticalAlignment="Center" />
+                <TextBlock Text="●" FontSize="11" Foreground="{DynamicResource JumboAmber}"
+                           IsVisible="{Binding !SensorOk}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding SensorText}" FontSize="12" FontFamily="Consolas, Menlo, monospace"
+                           Foreground="{DynamicResource JumboSub}" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+                <Border Width="1" Height="12" Background="{DynamicResource JumboStroke}" />
+                <TextBlock Text="{Binding ConnectionText}" FontSize="12"
+                           Foreground="{DynamicResource JumboDim}" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <TextBlock Classes="dim" FontSize="11.5" TextWrapping="Wrap"
+                       Text="开度范围 0–100；PID 试探限幅 1–15 且单次试探最长 180 秒；保持误差超过 2.0 自动停止；传感器超过 0.5 秒无更新将全部置零。本地 PUB 不提供远端执行确认，现场须保留设备侧急停。" />
+        </StackPanel>
+    </Grid>
+</UserControl>

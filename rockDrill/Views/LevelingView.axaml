@@ -1,0 +1,198 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             xmlns:myControls="clr-namespace:rockDrill.MyControls"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.LevelingView"
+             x:DataType="vm:LevelingViewModel">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="设备调平系统" />
+                <TextBlock Classes="sub" Text="双轴倾角监测 · 支腿自动补偿 · 水平度判定" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag ok"><TextBlock Text="{Binding StateText}" /></Border>
+                <Border Classes="tag info"><TextBlock Text="{Binding ModeText}" /></Border>
+                <Border Classes="tag"><TextBlock Text="精度 ±0.05°" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="318,*,318" ColumnSpacing="12">
+
+            <!-- ================= 左：倾角 / 支腿 ================= -->
+            <StackPanel Grid.Column="0" Spacing="12">
+                <Border Classes="card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="card-title" Text="倾角仪" />
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="3">
+                                <TextBlock Classes="dim" Text="左右倾角（横滚）" />
+                                <TextBlock Text="{Binding RollText}" FontSize="30" FontWeight="Bold"
+                                           FontFamily="Consolas, Menlo, monospace"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="3" HorizontalAlignment="Right" Margin="0,0,0,4">
+                                <TextBlock Classes="dim" Text="前后倾角（俯仰）" HorizontalAlignment="Right" />
+                                <TextBlock Text="{Binding PitchText}" FontSize="20" FontWeight="SemiBold"
+                                           FontFamily="Consolas, Menlo, monospace"
+                                           Foreground="{DynamicResource JumboText}" HorizontalAlignment="Right" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Classes="hr" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="允许偏差" />
+                            <TextBlock Grid.Column="1" Text="± 0.20°" FontSize="14"
+                                       Foreground="{DynamicResource JumboGreen}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="传感器型号" />
+                            <TextBlock Grid.Column="1" Text="SCA-126T 双轴" FontSize="14"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="上次调平" />
+                            <TextBlock Grid.Column="1" Text="{Binding LastLevelText}" FontSize="14"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="支腿状态" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Classes="tag ok"><TextBlock Text="4 / 4 到位" /></Border>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Legs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LegVm">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,5,0,5">
+                                        <Ellipse Width="6" Height="6" Fill="{Binding Brush}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13"
+                                                   Foreground="{DynamicResource JumboSub}"
+                                                   Margin="9,0,0,0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding StateText}" FontSize="12.5"
+                                                   Foreground="{DynamicResource JumboGreen}" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card flat">
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="card-title" Text="调平说明" />
+                        <TextBlock Classes="dim" TextWrapping="Wrap"
+                                   Text="调平前须将臂架收回至运输位、支腿完全伸出并锁定；调平完成后系统自动锁定支腿液压。" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ================= 中：调平指示器 ================= -->
+            <Border Grid.Column="1" Classes="card">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="card-title" Text="水平度指示" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse Width="7" Height="7" Fill="#8CFF3D" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="水平" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse Width="7" Height="7" Fill="{DynamicResource JumboAmber}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="超差" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Viewbox Grid.Row="1" Stretch="Uniform" Margin="10,6">
+                        <myControls:LevelBubble Width="460" Height="460"
+                                                TiltX="{Binding TiltX}"
+                                                TiltY="{Binding TiltY}"
+                                                MaxTilt="8"
+                                                Tolerance="0.2" />
+                    </Viewbox>
+
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="7" Height="7" Fill="{DynamicResource JumboGreen}" VerticalAlignment="Center" />
+                            <TextBlock Classes="sub" Text="{Binding ActionHint}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Classes="tag info" VerticalAlignment="Center">
+                            <TextBlock Text="X：左右  Y：前后" />
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ================= 右：调平控制 ================= -->
+            <StackPanel Grid.Column="2" Spacing="12">
+                <Border Classes="card hi">
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="card-title" Text="调平控制" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="当前状态" />
+                            <TextBlock Grid.Column="1" Text="{Binding StateText}" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource JumboGreen}" />
+                        </Grid>
+                        <StackPanel Spacing="5">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="dim" Text="调平完成度" />
+                                <TextBlock Grid.Column="1" Text="100 %" FontSize="13"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </Grid>
+                            <myControls:LevelBar Height="8" Value="100" Maximum="100"
+                                                 FillBrush="{DynamicResource JumboGreen}" />
+                        </StackPanel>
+                        <Border Classes="hr" />
+                        <Button Theme="{StaticResource JumboPrimaryButton}" Content="自动调平"
+                                HorizontalAlignment="Stretch" Command="{Binding StartLevelingCommand}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Theme="{StaticResource JumboButton}" Content="点动调平"
+                                    HorizontalAlignment="Stretch" />
+                            <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="停止调平"
+                                    HorizontalAlignment="Stretch" Command="{Binding StopLevelingCommand}" />
+                        </Grid>
+                        <Button Theme="{StaticResource JumboButton}" Content="确认并锁定支腿"
+                                HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <TextBlock Classes="card-title" Text="车体姿态" />
+                        <ItemsControl>
+                            <StackPanel Spacing="8">
+                                <Grid ColumnDefinitions="76,*">
+                                    <TextBlock Classes="dim" Text="横滚 X" VerticalAlignment="Center" />
+                                    <myControls:LevelBar Grid.Column="1" Height="6"
+                                                         Value="{Binding TiltX}" Minimum="-8" Maximum="8"
+                                                         Target="0.5" FillBrush="{DynamicResource JumboAccent}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="76,*">
+                                    <TextBlock Classes="dim" Text="俯仰 Y" VerticalAlignment="Center" />
+                                    <myControls:LevelBar Grid.Column="1" Height="6"
+                                                         Value="{Binding TiltY}" Minimum="-8" Maximum="8"
+                                                         Target="0.5" FillBrush="{DynamicResource JumboViolet}" />
+                                </Grid>
+                            </StackPanel>
+                        </ItemsControl>
+                        <Border Background="#0B151D" CornerRadius="8" Padding="10,8">
+                            <TextBlock Classes="dim" TextWrapping="Wrap"
+                                       Text="提示：倾角数据刷新周期 100 ms，超差时禁止启动自动钻孔。" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

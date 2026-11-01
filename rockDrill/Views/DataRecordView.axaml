@@ -1,0 +1,198 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.DataRecordView"
+             x:DataType="vm:DataRecordViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.field">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBox.form">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Padding" Value="10,3" />
+            <Setter Property="Background" Value="#0B151D" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+        </Style>
+        <Style Selector="TextBlock.cell">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Consolas, Menlo, monospace" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="数据管理" />
+                <TextBlock Classes="sub" Text="施工参数录入 · 钻孔过程数据 · 上传平台" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag ok"><TextBlock Text="本地库正常" /></Border>
+                <Border Classes="tag info"><TextBlock Text="自动刷新：开" /></Border>
+                <Border Classes="tag"><TextBlock Text="MES 在线" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="352,*" ColumnSpacing="12">
+
+            <!-- ================= 左：工点信息 ================= -->
+            <Border Grid.Column="0" Classes="card">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <TextBlock Classes="card-title" Text="工点信息录入" />
+
+                    <StackPanel Grid.Row="1" Spacing="12" Margin="0,14,0,0">
+                        <Grid ColumnDefinitions="112,*">
+                            <TextBlock Classes="field" Text="工点编码" />
+                            <TextBox Grid.Column="1" Classes="form" Text="{Binding SiteCode}"
+                                     PlaceholderText="请输入工点编码" />
+                        </Grid>
+                        <Grid ColumnDefinitions="112,*">
+                            <TextBlock Classes="field" Text="开始里程冠号" />
+                            <TextBox Grid.Column="1" Classes="form" Text="{Binding StartChainageNo}"
+                                     PlaceholderText="请输入开始里程冠号" />
+                        </Grid>
+                        <Grid ColumnDefinitions="112,*">
+                            <TextBlock Classes="field" Text="开始里程值" />
+                            <TextBox Grid.Column="1" Classes="form" Text="{Binding StartChainageValue}"
+                                     PlaceholderText="请输入开始里程值" />
+                        </Grid>
+                        <Grid ColumnDefinitions="112,*">
+                            <TextBlock Classes="field" Text="身份证号码" />
+                            <TextBox Grid.Column="1" Classes="form" Text="{Binding IdCard}"
+                                     PlaceholderText="请输入身份证号码" />
+                        </Grid>
+                        <Grid ColumnDefinitions="112,*">
+                            <TextBlock Classes="field" Text="机号" />
+                            <TextBox Grid.Column="1" Classes="form" Text="{Binding MachineNo}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="112,*">
+                            <TextBlock Classes="field" Text="作业类型" />
+                            <TextBox Grid.Column="1" Classes="form" Text="{Binding WorkType}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="112,*">
+                            <TextBlock Classes="field" Text="孔径 (mm)" />
+                            <TextBox Grid.Column="1" Classes="form" Text="{Binding HoleDiameter}"
+                                     PlaceholderText="请输入孔径 (mm)" />
+                        </Grid>
+
+                        <Border Background="#0B151D" CornerRadius="8" Padding="10,8">
+                            <TextBlock Classes="dim" TextWrapping="Wrap" Text="{Binding HintText}" />
+                        </Border>
+                    </StackPanel>
+
+                    <Button Grid.Row="2" Theme="{StaticResource JumboPrimaryButton}" Content="确　认"
+                            HorizontalAlignment="Stretch" Padding="0,11" Margin="0,14,0,0" FontSize="14"
+                            Command="{Binding ConfirmSiteCommand}" />
+                </Grid>
+            </Border>
+
+            <!-- ================= 右：历史数据 ================= -->
+            <Border Grid.Column="1" Classes="card">
+                <Grid RowDefinitions="Auto,*,Auto">
+
+                    <!-- 工具条 -->
+                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
+                        <TextBlock Classes="field" Text="里程号" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Classes="form" Width="180" Margin="10,0,0,0"
+                                 Text="{Binding ChainageInput}" PlaceholderText="请输入里程号" />
+                        <Button Grid.Column="2" Theme="{StaticResource JumboButton}" Content="确认"
+                                Padding="16,5" FontSize="12.5" Margin="8,0,0,0"
+                                Command="{Binding SetChainageCommand}" />
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Classes="dim" Text="当前里程号：" />
+                            <TextBlock Text="{Binding CurrentChainageText}" FontSize="12.5"
+                                       Foreground="{DynamicResource JumboAccent}" />
+                        </StackPanel>
+                        <Button Grid.Column="4" Theme="{StaticResource JumboButton}" Content="刷新"
+                                Padding="16,5" FontSize="12.5" Command="{Binding RefreshCommand}" />
+                    </Grid>
+
+                    <!-- 表格 -->
+                    <Border Grid.Row="1" Background="#0B151D" CornerRadius="10" Margin="0,12,0,0"
+                            BorderBrush="{DynamicResource JumboStroke}" BorderThickness="1" Padding="0,6">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                            <StackPanel MinWidth="1070">
+                                <!-- 表头 -->
+                                <Grid ColumnDefinitions="60,140,100,84,84,68,68,88,88,88,88,88,96"
+                                      Margin="12,2,12,8">
+                                    <TextBlock Classes="dim" Text="ID" />
+                                    <TextBlock Grid.Column="1" Classes="dim" Text="时间" />
+                                    <TextBlock Grid.Column="2" Classes="dim" Text="里程号" />
+                                    <TextBlock Grid.Column="3" Classes="dim" Text="显示状态" />
+                                    <TextBlock Grid.Column="4" Classes="dim" Text="阀体状态" />
+                                    <TextBlock Grid.Column="5" Classes="dim" Text="油温(℃)" />
+                                    <TextBlock Grid.Column="6" Classes="dim" Text="油位(%)" />
+                                    <TextBlock Grid.Column="7" Classes="dim" Text="左冲击(bar)" />
+                                    <TextBlock Grid.Column="8" Classes="dim" Text="左背压(bar)" />
+                                    <TextBlock Grid.Column="9" Classes="dim" Text="左旋转(bar)" />
+                                    <TextBlock Grid.Column="10" Classes="dim" Text="左推进(bar)" />
+                                    <TextBlock Grid.Column="11" Classes="dim" Text="右冲击(bar)" />
+                                    <TextBlock Grid.Column="12" Classes="dim" Text="左孔深(mm)" />
+                                </Grid>
+                                <Border Classes="hr" Margin="12,0,12,6" />
+
+                                <ItemsControl ItemsSource="{Binding Rows}" Margin="12,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:DataRowVm">
+                                            <Border Background="#0F1B24" CornerRadius="6" Padding="0,7" Margin="0,0,0,4">
+                                                <Grid ColumnDefinitions="60,140,100,84,84,68,68,88,88,88,88,88,96">
+                                                    <TextBlock Classes="cell" Text="{Binding Id}" />
+                                                    <TextBlock Grid.Column="1" Classes="cell" Text="{Binding Time}" />
+                                                    <TextBlock Grid.Column="2" Classes="cell" Text="{Binding Chainage}" />
+                                                    <TextBlock Grid.Column="3" Classes="cell" Text="{Binding DisplayState}"
+                                                               Foreground="{DynamicResource JumboGreen}" />
+                                                    <TextBlock Grid.Column="4" Classes="cell" Text="{Binding ValveState}"
+                                                               Foreground="{DynamicResource JumboGreen}" />
+                                                    <TextBlock Grid.Column="5" Classes="cell" Text="{Binding OilTemp}" />
+                                                    <TextBlock Grid.Column="6" Classes="cell" Text="{Binding OilLevel}" />
+                                                    <TextBlock Grid.Column="7" Classes="cell" Text="{Binding LeftImpact}" />
+                                                    <TextBlock Grid.Column="8" Classes="cell" Text="{Binding LeftBack}" />
+                                                    <TextBlock Grid.Column="9" Classes="cell" Text="{Binding LeftRotate}" />
+                                                    <TextBlock Grid.Column="10" Classes="cell" Text="{Binding LeftFeed}" />
+                                                    <TextBlock Grid.Column="11" Classes="cell" Text="{Binding RightImpact}" />
+                                                    <TextBlock Grid.Column="12" Classes="cell" Text="{Binding LeftDepth}"
+                                                               Foreground="{DynamicResource JumboText}" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- 分页 -->
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,10,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Classes="dim" Text="每页" VerticalAlignment="Center" />
+                            <Border Classes="tag"><TextBlock Text="50" /></Border>
+                            <TextBlock Classes="dim" Text="条" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="18,0,0,0">
+                            <Button Theme="{StaticResource JumboButton}" Content="首页" Padding="12,4" FontSize="12" />
+                            <Button Theme="{StaticResource JumboButton}" Content="上一页" Padding="12,4" FontSize="12" />
+                            <Border Classes="tag info"><TextBlock Text="{Binding PageText}" /></Border>
+                            <Button Theme="{StaticResource JumboButton}" Content="下一页" Padding="12,4" FontSize="12" />
+                            <Button Theme="{StaticResource JumboButton}" Content="末页" Padding="12,4" FontSize="12" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="3" Classes="dim" Text="{Binding TotalText}" VerticalAlignment="Center" />
+                        <Button Grid.Column="4" Theme="{StaticResource JumboButton}" Content="导出 CSV"
+                                Padding="14,5" FontSize="12" Margin="14,0,0,0" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -32,18 +32,18 @@
 需要安装 [.NET 10 SDK](https://dotnet.microsoft.com/download)。
 
 ```bash
-# 在项目根目录（含 ava.sln）执行
-dotnet run --project ava
+# 在项目根目录（含 rockDrill.sln）执行
+dotnet run --project rockDrill
 ```
 
-或者用 Visual Studio / Rider 打开 `ava.sln`，直接运行 `ava` 项目。
+或者用 Visual Studio / Rider 打开 `rockDrill.sln`，直接运行 `rockDrill` 项目。
 
 ## 项目结构
 
 ```
-ava/
-├── ava.sln                  # 解决方案文件
-├── ava/                     # 主项目
+rockDrill/
+├── rockDrill.sln                  # 解决方案文件
+├── rockDrill/                     # 主项目
 │   ├── App.axaml            # 应用入口
 │   ├── Program.cs
 │   ├── ViewModels/          # 各页面的数据逻辑（页面功能主要在这里）

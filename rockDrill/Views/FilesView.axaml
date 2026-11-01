@@ -1,0 +1,132 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.FilesView"
+             x:DataType="vm:FilesViewModel">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="文件资料" />
+                <TextBlock Classes="sub" Text="随机手册 · 图纸 · 施工文件" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag info"><TextBlock Text="本地 6 个文件" /></Border>
+                <Button Theme="{StaticResource JumboButton}" Content="上传文件" Padding="14,6" FontSize="12.5" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="392,*" ColumnSpacing="12">
+
+            <!-- ================= 左：文件列表 ================= -->
+            <Border Grid.Column="0" Classes="card">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="card-title" Text="文件列表" VerticalAlignment="Center" />
+                        <Border Grid.Column="1" Classes="tag"><TextBlock Text="按时间排序" /></Border>
+                    </Grid>
+
+                    <ListBox Grid.Row="1" Theme="{StaticResource JumboList}" Margin="0,12,0,0"
+                             ItemsSource="{Binding Files}"
+                             SelectedItem="{Binding SelectedFile, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:FileItemVm">
+                                <Border Background="#0F1B24" CornerRadius="8" Padding="12,10">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border Width="34" Height="40" CornerRadius="6" Background="#2A1216"
+                                                BorderBrush="#6B2029" BorderThickness="1">
+                                            <TextBlock Text="{Binding Kind}" FontSize="10.5" FontWeight="Bold"
+                                                       Foreground="#FF8A94"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Spacing="3" Margin="10,0,0,0">
+                                            <TextBlock Text="{Binding Name}" FontSize="13"
+                                                       Foreground="{DynamicResource JumboText}"
+                                                       TextWrapping="Wrap" />
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <TextBlock Text="{Binding Size}" FontSize="11.5"
+                                                           Foreground="{DynamicResource JumboDim}" />
+                                                <TextBlock Text="{Binding Date}" FontSize="11.5"
+                                                           Foreground="{DynamicResource JumboDim}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="8" Margin="0,10,0,0">
+                        <Button Grid.Column="0" Theme="{StaticResource JumboButton}" Content="导入"
+                                HorizontalAlignment="Stretch" FontSize="12.5" />
+                        <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="删除"
+                                HorizontalAlignment="Stretch" FontSize="12.5" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ================= 右：预览 ================= -->
+            <Border Grid.Column="1" Classes="card">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="3">
+                            <TextBlock Classes="section" Text="{Binding PreviewTitle}" />
+                            <TextBlock Classes="dim" Text="{Binding PreviewSub}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <Button Theme="{StaticResource JumboButton}" Content="导出到 U 盘"
+                                    Padding="14,6" FontSize="12.5" Command="{Binding ExportCommand}" />
+                            <Button Theme="{StaticResource JumboPrimaryButton}" Content="打开"
+                                    Padding="16,6" FontSize="12.5" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 文档预览页 -->
+                    <Border Grid.Row="1" Background="#E9EEF3" CornerRadius="10" Margin="0,12,0,0" Padding="28,22">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="{Binding PreviewTitle}" FontSize="20" FontWeight="Bold"
+                                           Foreground="#1B2733" TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding PreviewSub}" FontSize="12" Foreground="#5B6B7A" />
+                                <Border Height="1" Background="#C3CDD7" Margin="0,4" />
+
+                                <TextBlock Text="1  概述" FontSize="15" FontWeight="SemiBold" Foreground="#1B2733" />
+                                <TextBlock FontSize="12.5" Foreground="#33414F" TextWrapping="Wrap" LineHeight="21"
+                                           Text="本文件适用于双臂凿岩台车电控系统。控制器采用 0832G 主控模块，配 CAN0~CAN3 四路总线，分别连接操作台、臂架传感器、遥控器与数显表。" />
+
+                                <TextBlock Text="2  技术参数" FontSize="15" FontWeight="SemiBold" Foreground="#1B2733" />
+                                <Border Background="#F3F6F9" CornerRadius="6" Padding="12">
+                                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                                        <TextBlock FontSize="12.5" Foreground="#33414F" Text="供电电压：DC 24 V" />
+                                        <TextBlock Grid.Column="1" FontSize="12.5" Foreground="#33414F" Text="防护等级：IP67" />
+                                        <TextBlock Grid.Row="1" FontSize="12.5" Foreground="#33414F" Text="数字量输入：32 路" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="12.5" Foreground="#33414F" Text="数字量输出：24 路" />
+                                        <TextBlock Grid.Row="2" FontSize="12.5" Foreground="#33414F" Text="模拟量输入：8 路 4~20 mA" />
+                                        <TextBlock Grid.Row="2" Grid.Column="1" FontSize="12.5" Foreground="#33414F" Text="工作温度：-20 ~ 70 ℃" />
+                                    </Grid>
+                                </Border>
+
+                                <TextBlock Text="3  接线说明" FontSize="15" FontWeight="SemiBold" Foreground="#1B2733" />
+                                <TextBlock FontSize="12.5" Foreground="#33414F" TextWrapping="Wrap" LineHeight="21"
+                                           Text="CAN 总线须采用屏蔽双绞线，屏蔽层单端接地；终端电阻 120 Ω 安装于总线两端节点，中间节点不得接入。" />
+
+                                <Border Height="1" Background="#C3CDD7" Margin="0,6" />
+                                <TextBlock Text="{Binding PageText}" FontSize="11.5" Foreground="#7A8896"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Row="2" Background="#0B151D" CornerRadius="8" Padding="12,9" Margin="0,12,0,0">
+                        <TextBlock Classes="dim" Text="{Binding HintText}" />
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

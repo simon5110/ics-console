@@ -1,0 +1,277 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             xmlns:myControls="clr-namespace:rockDrill.MyControls"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.MonitorView"
+             x:DataType="vm:MonitorViewModel">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="凿岩监控" />
+                <TextBlock Classes="sub" Text="实时仪表盘 · 采样周期 100 ms · 阈值超限自动转色" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag info"><TextBlock Text="左臂 BOOM-A" /></Border>
+                <Border Classes="tag ok"><TextBlock Text="数据记录中" /></Border>
+                <Border Classes="tag"><TextBlock Text="{Binding HoleNoText}" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="258,*,312" ColumnSpacing="12">
+
+            <!-- ================= 左：通道 / 记录设置 ================= -->
+            <StackPanel Grid.Column="0" Spacing="12">
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="card-title" Text="监测通道" />
+                        <ItemsControl ItemsSource="{Binding Channels}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ChannelVm">
+                                    <Border CornerRadius="8" Padding="10,7" Margin="0,0,0,5" Background="#101C25">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Border Width="3" Height="20" CornerRadius="2" Background="{Binding Brush}" />
+                                            <StackPanel Grid.Column="1" Spacing="1" Margin="9,0,0,0">
+                                                <TextBlock Text="{Binding Name}" FontSize="12"
+                                                           Foreground="{DynamicResource JumboSub}" />
+                                                <TextBlock Text="{Binding ValueText}" FontSize="12.5"
+                                                           FontFamily="Consolas, Menlo, monospace"
+                                                           Foreground="{DynamicResource JumboText}" />
+                                            </StackPanel>
+                                            <Ellipse Grid.Column="2" Width="7" Height="7" Fill="{Binding Brush}"
+                                                     VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <TextBlock Classes="card-title" Text="记录设置" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="采样周期" />
+                            <TextBlock Grid.Column="1" Text="100 ms" FontSize="12"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="记录窗口" />
+                            <TextBlock Grid.Column="1" Text="30 s" FontSize="12"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="存储周期" />
+                            <TextBlock Grid.Column="1" Text="10 s / 帧" FontSize="12"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Border Classes="hr" />
+                        <TextBlock Classes="card-title" Text="阈值提醒" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="冲击压力上限" />
+                            <TextBlock Grid.Column="1" Text="22.0 MPa" FontSize="12"
+                                       Foreground="{DynamicResource JumboAmber}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="回转压力上限" />
+                            <TextBlock Grid.Column="1" Text="15.0 MPa" FontSize="12"
+                                       Foreground="{DynamicResource JumboAmber}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="推进压力上限" />
+                            <TextBlock Grid.Column="1" Text="12.0 MPa" FontSize="12"
+                                       Foreground="{DynamicResource JumboAmber}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ================= 中：仪表盘 ================= -->
+            <Border Grid.Column="1" Classes="card">
+                <Grid RowDefinitions="Auto,1.32*,*,Auto" RowSpacing="8">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Classes="card-title" Text="实时仪表盘" VerticalAlignment="Center" />
+                            <Border Classes="tag ok"><TextBlock Text="运行中" /></Border>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse Width="7" Height="7" Fill="{DynamicResource JumboAccent}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="正常" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse Width="7" Height="7" Fill="{DynamicResource JumboAmber}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="预警" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse Width="7" Height="7" Fill="{DynamicResource JumboRed}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="超限" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 主仪表 -->
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding MainGauges}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MetricVm">
+                                <myControls:GaugeDial Value="{Binding Value}"
+                                                      Minimum="{Binding Minimum}"
+                                                      Maximum="{Binding Maximum}"
+                                                      Title="{Binding Label}"
+                                                      Unit="{Binding Unit}"
+                                                      AccentBrush="{Binding Brush}"
+                                                      StrokeThickness="17"
+                                                      Margin="4,0" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- 副仪表 -->
+                    <ItemsControl Grid.Row="2" ItemsSource="{Binding SubGauges}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MetricVm">
+                                <myControls:GaugeDial Value="{Binding Value}"
+                                                      Minimum="{Binding Minimum}"
+                                                      Maximum="{Binding Maximum}"
+                                                      Title="{Binding Label}"
+                                                      Unit="{Binding Unit}"
+                                                      AccentBrush="{Binding Brush}"
+                                                      StrokeThickness="12"
+                                                      Compact="True"
+                                                      ShowTicks="False"
+                                                      Margin="4,0" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Border Grid.Row="3" Background="#0B151D" CornerRadius="8" Padding="12,9">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Ellipse Width="7" Height="7" Fill="{DynamicResource JumboGreen}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" VerticalAlignment="Center"
+                                           Text="全部通道处于正常区间，冲击压力接近目标值 14.5 MPa" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center"
+                                       Text="窗口均值 14.3 MPa · 峰值 15.9 MPa" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ================= 右：工步 / 变量 ================= -->
+            <StackPanel Grid.Column="2" Spacing="12">
+                <Border Classes="card hi">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="当前工步" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Classes="tag warn"><TextBlock Text="运行中" /></Border>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{Binding StepText}" FontSize="30" FontWeight="Bold"
+                                       Foreground="{DynamicResource JumboAccent}" />
+                            <StackPanel VerticalAlignment="Bottom" Spacing="2" Margin="0,0,0,6">
+                                <TextBlock Classes="sub" Text="{Binding HoleNoText}" />
+                                <TextBlock Classes="dim" Text="周边孔 · 设计 3.50 m" />
+                            </StackPanel>
+                        </StackPanel>
+                        <Border Classes="hr" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="当前孔深" />
+                            <TextBlock Grid.Column="1" Text="{Binding DepthText}" FontSize="14" FontWeight="SemiBold"
+                                       FontFamily="Consolas, Menlo, monospace"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <myControls:LevelBar Height="8" Value="52.6" Maximum="100"
+                                             FillBrush="{DynamicResource JumboAccent}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="card-title" Text="流程变量" />
+                        <ItemsControl ItemsSource="{Binding FlowVars}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MetricVm">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,5,0,5">
+                                        <Ellipse Width="6" Height="6" Fill="{Binding Brush}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="12.5"
+                                                   Foreground="{DynamicResource JumboSub}"
+                                                   Margin="9,0,0,0" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Display}" FontSize="13"
+                                                       FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboText}" />
+                                            <TextBlock Text="{Binding Unit}" FontSize="10"
+                                                       Foreground="{DynamicResource JumboDim}"
+                                                       VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Border Classes="hr" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="本孔采样点数" />
+                            <TextBlock Grid.Column="1" Text="18 420" FontSize="12"
+                                       FontFamily="Consolas, Menlo, monospace"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="有效钻进时间" />
+                            <TextBlock Grid.Column="1" Text="{Binding DrillTimeText}" FontSize="12"
+                                       FontFamily="Consolas, Menlo, monospace"
+                                       Foreground="{DynamicResource JumboGreen}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card flat">
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="card-title" Text="智能诊断" />
+                        <TextBlock Classes="dim" TextWrapping="Wrap"
+                                   Text="回转压力与推进压力同步上升，判断为遇裂隙卡钻倾向，建议降低推进压力 10%。" />
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                            <TextBlock Classes="dim" Text="压力波动" />
+                            <TextBlock Grid.Column="1" Text="{Binding WaveText}" FontSize="12"
+                                       Foreground="{DynamicResource JumboAmber}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="数据记录" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="记录中" FontSize="12"
+                                       Foreground="{DynamicResource JumboGreen}" VerticalAlignment="Center" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Theme="{StaticResource JumboButton}" Content="导出曲线"
+                                    HorizontalAlignment="Stretch" FontSize="12" Padding="0,8" />
+                            <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="生成报表"
+                                    HorizontalAlignment="Stretch" FontSize="12" Padding="0,8" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

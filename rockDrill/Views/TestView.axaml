@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.TestView"
+             x:DataType="vm:TestViewModel">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="臂架控制测试" />
+                <TextBlock Classes="sub" Text="维修模式单关节点动 · 仅限空载、无人员进入作业范围时使用" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag bad"><TextBlock Text="测试模式" /></Border>
+                <Border Classes="tag warn" IsVisible="{Binding IsEnabled}"><TextBlock Text="{Binding StateText}" /></Border>
+                <Border Classes="tag" IsVisible="{Binding !IsEnabled}"><TextBlock Text="{Binding StateText}" /></Border>
+                <Border Classes="tag info"><TextBlock Text="{Binding ModeText}" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,252" ColumnSpacing="12">
+
+            <!-- ================= 左：关节点动 ================= -->
+            <Border Grid.Column="0" Classes="card">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="card-title" Text="关节点动按钮" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center"
+                                   Text="按住执行，松开停止（点动）" />
+                    </Grid>
+
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Commands}" Margin="0,14,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4" ColumnSpacing="10" RowSpacing="10" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Button Theme="{StaticResource JumboButton}" Content="{Binding}"
+                                        Height="48" FontSize="13.5" HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Border>
+
+            <!-- ================= 右：控制 ================= -->
+            <StackPanel Grid.Column="1" Spacing="12">
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <TextBlock Classes="card-title" Text="控制使能" />
+                        <Button Theme="{StaticResource JumboPrimaryButton}" Content="启用控制"
+                                HorizontalAlignment="Stretch" Padding="0,11" FontSize="14"
+                                Command="{Binding EnableControlCommand}" />
+                        <Button Theme="{StaticResource JumboButton}" Content="停用控制"
+                                HorizontalAlignment="Stretch" Padding="0,11" FontSize="14"
+                                Command="{Binding DisableControlCommand}" />
+                        <Button Theme="{StaticResource JumboButton}" Content="重　置"
+                                HorizontalAlignment="Stretch" Padding="0,11" FontSize="14"
+                                Command="{Binding ResetCommand}" />
+                        <Button Theme="{StaticResource JumboButton}" Content="关节控制"
+                                HorizontalAlignment="Stretch" Padding="0,11" FontSize="14" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="card-title" Text="测试状态" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="使能" />
+                            <TextBlock Grid.Column="1" Text="{Binding StateText}" FontSize="13"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="当前关节" />
+                            <TextBlock Grid.Column="1" Text="臂架回转" FontSize="13"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="点动速度" />
+                            <TextBlock Grid.Column="1" Text="30 %" FontSize="13"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Border Background="#0B151D" CornerRadius="8" Padding="10,8">
+                            <TextBlock Classes="dim" TextWrapping="Wrap" Text="{Binding LastActionText}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card alarm">
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="card-title" Text="安全提示" Foreground="{DynamicResource JumboRed}" />
+                        <TextBlock Classes="dim" TextWrapping="Wrap"
+                                   Text="测试前须确认：臂架下方无人、支腿已支撑、急停按钮可用、现场设置警戒。禁止在自动钻孔状态下进入本页。" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

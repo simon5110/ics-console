@@ -1,0 +1,264 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             xmlns:myControls="clr-namespace:rockDrill.MyControls"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.HolePatternView"
+             x:DataType="vm:HolePatternViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.k">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.v">
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Grid.kv">
+            <Setter Property="Margin" Value="0,6" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="布孔图" />
+                <TextBlock Classes="sub" Text="掌子面 K2+186.5 · 左线 · 设计循环第 12 炮" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag info"><TextBlock Text="设计图纸 v3.2" /></Border>
+                <Border Classes="tag ok"><TextBlock Text="扫描点云已对齐" /></Border>
+                <Border Classes="tag"><TextBlock Text="坐标系：掌子面局部坐标" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="248,*,292" ColumnSpacing="12">
+
+            <!-- ================= 左侧：参数 ================= -->
+            <StackPanel Grid.Column="0" Spacing="12">
+                <Border Classes="card">
+                    <StackPanel Spacing="2">
+                        <TextBlock Classes="card-title" Text="掌子面参数" Margin="0,0,0,6" />
+                        <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="k" Text="断面尺寸" />
+                            <TextBlock Classes="v" Text="{Binding SectionText}" />
+                        </Grid>
+                        <Border Classes="hr" />
+                        <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="k" Text="循环进尺" />
+                            <TextBlock Classes="v" Text="{Binding AdvanceText}" />
+                        </Grid>
+                        <Border Classes="hr" />
+                        <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="k" Text="炮孔总数" />
+                            <TextBlock Classes="v" Text="96 个" />
+                        </Grid>
+                        <Border Classes="hr" />
+                        <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="k" Text="炮孔直径" />
+                            <TextBlock Classes="v" Text="{Binding DiameterText}" />
+                        </Grid>
+                        <Border Classes="hr" />
+                        <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="k" Text="设计装药量" />
+                            <TextBlock Classes="v" Text="{Binding PowderText}" />
+                        </Grid>
+                        <Border Classes="hr" />
+                        <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="k" Text="掏槽形式" />
+                            <TextBlock Classes="v" Text="直眼掏槽" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <TextBlock Classes="card-title" Text="图例" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="11" Height="11" Fill="#15402F" Stroke="#2AD07C" StrokeThickness="1.2" VerticalAlignment="Center" />
+                            <TextBlock Classes="sub" Text="已完成" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="11" Height="11" Fill="#4A3612" Stroke="#F5A623" StrokeThickness="1.4" VerticalAlignment="Center" />
+                            <TextBlock Classes="sub" Text="正在钻进" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="11" Height="11" Fill="#16242F" Stroke="#33506A" StrokeThickness="1.2" VerticalAlignment="Center" />
+                            <TextBlock Classes="sub" Text="待钻" />
+                            <TextBlock Classes="dim" Text="{Binding RemainText}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="11" Height="11" Fill="#42151B" Stroke="#ED4C5C" StrokeThickness="1.4" VerticalAlignment="Center" />
+                            <TextBlock Classes="sub" Text="异常孔" />
+                            <TextBlock Classes="dim" Text="1 个" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="card-title" Text="操作" Margin="0,0,0,2" />
+                        <Button Theme="{StaticResource JumboPrimaryButton}" Content="重新生成布孔图" HorizontalAlignment="Stretch" />
+                        <Button Theme="{StaticResource JumboButton}" Content="扫描掌子面" HorizontalAlignment="Stretch" />
+                        <Button Theme="{StaticResource JumboButton}" Content="导入设计文件" HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ================= 中间：炮孔布置图 ================= -->
+            <Border Grid.Column="1" Classes="card" Padding="14">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Classes="card-title" Text="掌子面炮孔布置" VerticalAlignment="Center" />
+                            <Border Classes="tag info"><TextBlock Text="96 孔 · 直眼掏槽" /></Border>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Classes="dim"
+                                   Text="断面 12.40 m × 9.20 m　|　点云偏差 ≤ 32 mm"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="#081016" CornerRadius="10" Margin="0,12,0,0"
+                            BorderBrush="{DynamicResource JumboStroke}" BorderThickness="1" Padding="10">
+                        <Grid>
+                            <Viewbox Stretch="Uniform">
+                                <myControls:HoleMapCanvas Width="800" Height="560"
+                                                          Holes="{Binding Holes}"
+                                                          SelectedHole="{Binding SelectedHole}" />
+                            </Viewbox>
+
+                            <!-- 尺寸标注 -->
+                            <TextBlock Text="12.40 m" FontSize="12.5" Foreground="{DynamicResource JumboDim}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Top" />
+                            <TextBlock Text="9.20 m" FontSize="12.5" Foreground="{DynamicResource JumboDim}"
+                                       HorizontalAlignment="Left" VerticalAlignment="Center" />
+                            <TextBlock Text="隧道中线" FontSize="12.5" Foreground="{DynamicResource JumboAccent}"
+                                       Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,12,0,0">
+                        <TextBlock Classes="sub" Text="炮孔完成度" VerticalAlignment="Center" />
+                        <myControls:LevelBar Grid.Column="1" Height="8" Margin="12,0"
+                                             Value="{Binding DonePercent}" Maximum="100"
+                                             FillBrush="{DynamicResource JumboGreen}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="section" Text="{Binding DoneText}"
+                                   VerticalAlignment="Center" Margin="0,0,14,0" />
+                        <Button Grid.Column="3" Theme="{StaticResource JumboButton}" Content="切换至钻孔"
+                                Padding="14,6" FontSize="14" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ================= 右侧：当前孔 / 进度 / 统计 ================= -->
+            <StackPanel Grid.Column="2" Spacing="12">
+
+                <Border Classes="card hi">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="当前炮孔" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Classes="tag warn"><TextBlock Text="{Binding SelectedStateText}" /></Border>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{Binding SelectedNoText}" FontSize="33" FontWeight="Bold"
+                                       FontFamily="Consolas, Menlo, monospace"
+                                       Foreground="{DynamicResource JumboAccent}" />
+                            <StackPanel VerticalAlignment="Bottom" Spacing="2" Margin="0,0,0,5">
+                                <TextBlock Classes="sub" Text="{Binding SelectedTypeText}" />
+                                <TextBlock Classes="dim" Text="{Binding SelectedBoomText}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Border Classes="hr" />
+
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="9">
+                            <StackPanel Spacing="2">
+                                <TextBlock Classes="dim" Text="X 坐标 / m" />
+                                <TextBlock Classes="metric-sm" Text="{Binding SelectedXText}" FontSize="17" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="dim" Text="Y 坐标 / m" />
+                                <TextBlock Classes="metric-sm" Text="{Binding SelectedYText}" FontSize="17" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Spacing="2">
+                                <TextBlock Classes="dim" Text="设计孔深 / m" />
+                                <TextBlock Classes="metric-sm" Text="{Binding SelectedDepthText}" FontSize="17" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="dim" Text="钻进角度 / °" />
+                                <TextBlock Classes="metric-sm" Text="{Binding SelectedAngleText}" FontSize="17" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Spacing="2">
+                                <TextBlock Classes="dim" Text="状态" />
+                                <TextBlock Text="{Binding SelectedStateText}" FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{Binding SelectedStateBrush}" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="dim" Text="执行臂架" />
+                                <TextBlock Text="{Binding SelectedBoomText}" FontSize="15"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="本循环完成度" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Classes="dim" Text="{Binding RemainText}" VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Text="{Binding DoneText}" FontSize="25" FontWeight="Bold"
+                                   FontFamily="Consolas, Menlo, monospace"
+                                   Foreground="{DynamicResource JumboText}" />
+                        <myControls:LevelBar Height="9" Value="{Binding DonePercent}" Maximum="100"
+                                             FillBrush="{DynamicResource JumboGreen}" />
+                        <Grid ColumnDefinitions="*,*" Margin="0,2,0,0">
+                            <StackPanel Spacing="2">
+                                <TextBlock Classes="dim" Text="正常完成" />
+                                <TextBlock Text="{Binding DoneCount}" FontSize="16" Foreground="{DynamicResource JumboGreen}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
+                                <TextBlock Classes="dim" Text="异常孔数" HorizontalAlignment="Right" />
+                                <TextBlock Text="{Binding FaultCount}" FontSize="16" Foreground="{DynamicResource JumboRed}"
+                                           HorizontalAlignment="Right" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="card-title" Text="按类型统计" />
+                        <ItemsControl ItemsSource="{Binding TypeStats}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:HoleTypeStatVm">
+                                    <Grid ColumnDefinitions="70,*,54" Margin="0,5,0,5">
+                                        <TextBlock Text="{Binding Name}" FontSize="14"
+                                                   Foreground="{DynamicResource JumboSub}" VerticalAlignment="Center" />
+                                        <myControls:LevelBar Grid.Column="1" Height="6" Margin="0,0,8,0"
+                                                             Value="{Binding Percent}" Maximum="100"
+                                                             FillBrush="{Binding Brush}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding CountText}" FontSize="13.5"
+                                                   FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{DynamicResource JumboText}"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

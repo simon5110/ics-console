@@ -1,0 +1,183 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             xmlns:myControls="clr-namespace:rockDrill.MyControls"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.ScanView"
+             x:DataType="vm:ScanViewModel">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="激光雷达扫描" />
+                <TextBlock Classes="sub" Text="掌子面点云采集 · 超欠挖分析" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag info"><TextBlock Text="雷达在线" /></Border>
+                <Border Classes="tag"><TextBlock Text="点云 682 400 点" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,372" ColumnSpacing="12">
+
+            <!-- ================= 左：扫描 ================= -->
+            <Border Grid.Column="0" Classes="card">
+                <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Classes="card-title" Text="激光雷达" VerticalAlignment="Center" />
+                            <Border Classes="tag warn"><TextBlock Text="{Binding StatusText}" /></Border>
+                        </StackPanel>
+                        <Grid Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
+                            <Button Theme="{StaticResource JumboButton}" Content="开始扫描" Padding="16,7" FontSize="13"
+                                    Background="#1B6B45" BorderBrush="#2E9C63" Foreground="#C9FFE2"
+                                    Command="{Binding StartScanCommand}" />
+                            <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="停止扫描" Padding="16,7" FontSize="13"
+                                    Background="#5A2029" BorderBrush="#8C2F3C" Foreground="#FFD5D9"
+                                    Command="{Binding StopScanCommand}" />
+                            <Button Grid.Column="2" Theme="{StaticResource JumboButton}" Content="导出数据" Padding="16,7" FontSize="13"
+                                    Background="#12496E" BorderBrush="#1E6E9E" Foreground="#CFEBFF" />
+                        </Grid>
+                    </Grid>
+
+                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                        <TextBlock Classes="dim" Text="3D 视图 · 激光雷达数据" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                            <TextBlock Classes="dim" Text="点云" />
+                            <TextBlock Classes="dim" Text="{Binding PointCountText}"
+                                       Foreground="{DynamicResource JumboSub}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="2" Background="#081016" CornerRadius="10" Margin="0,8,0,0"
+                            BorderBrush="{DynamicResource JumboStroke}" BorderThickness="1">
+                        <Grid>
+                            <myControls:PointCloudCanvas Progress="{Binding Progress}" Margin="10" />
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6"
+                                        IsVisible="{Binding !HasData}">
+                                <TextBlock Text="3D 视图" FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource JumboSub}" HorizontalAlignment="Center" />
+                                <TextBlock Text="激光雷达数据待采集" FontSize="12.5"
+                                           Foreground="{DynamicResource JumboDim}" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,12,0,0">
+                        <StackPanel Spacing="4">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="dim" Text="扫描进度" />
+                            <TextBlock Grid.Column="1" Text="{Binding ProgressText}" FontSize="12.5"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </Grid>
+                            <myControls:LevelBar Height="8" Value="{Binding Progress}" Maximum="100"
+                                                 FillBrush="{DynamicResource JumboCyan}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Classes="dim" Text="{Binding HintText}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ================= 右：分析 ================= -->
+            <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="12">
+
+                <Border Grid.Row="0" Classes="card">
+                    <Grid RowDefinitions="Auto,*,Auto">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="card-title" Text="数据分析" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Classes="tag ok" IsVisible="{Binding HasData}">
+                                <TextBlock Text="{Binding AnalysisStateText}" />
+                            </Border>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,12,0,0" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                            <Border Background="#0F1B24" CornerRadius="10" Padding="14">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Classes="dim" Text="断面面积" />
+                                    <TextBlock Text="{Binding AreaText}" FontSize="24" FontWeight="Bold"
+                                               FontFamily="Consolas, Menlo, monospace"
+                                               Foreground="{DynamicResource JumboText}" />
+                                </StackPanel>
+                            </Border>
+                            <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <Border Background="#0F1B24" CornerRadius="10" Padding="14">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="dim" Text="最大超挖" />
+                                        <TextBlock Text="{Binding OverCutText}" FontSize="19" FontWeight="SemiBold"
+                                                   FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{DynamicResource JumboAmber}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" Background="#0F1B24" CornerRadius="10" Padding="14">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="dim" Text="最大欠挖" />
+                                        <TextBlock Text="{Binding UnderCutText}" FontSize="19" FontWeight="SemiBold"
+                                                   FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{DynamicResource JumboCyan}" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <Border Grid.Row="2" Background="#0F1B24" CornerRadius="10" Padding="14">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Classes="dim" Text="断面平整度" />
+                                    <TextBlock Text="{Binding FlatnessText}" FontSize="19" FontWeight="SemiBold"
+                                               FontFamily="Consolas, Menlo, monospace"
+                                               Foreground="{DynamicResource JumboGreen}" />
+                                </StackPanel>
+                            </Border>
+                            <ItemsControl Grid.Row="3" ItemsSource="{Binding ScanParams}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:MetricVm">
+                                        <Grid ColumnDefinitions="86,*,70" Margin="0,4,0,4">
+                                            <TextBlock Text="{Binding Label}" FontSize="12"
+                                                       Foreground="{DynamicResource JumboSub}" VerticalAlignment="Center" />
+                                            <myControls:LevelBar Grid.Column="1" Height="6" Margin="0,0,8,0"
+                                                                 Value="{Binding Value}" Maximum="{Binding Maximum}"
+                                                                 FillBrush="{Binding Brush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Display}" FontSize="12"
+                                                       FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboText}"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+
+                        <Button Grid.Row="2" Theme="{StaticResource JumboPrimaryButton}" Content="开始分析"
+                                HorizontalAlignment="Stretch" Padding="0,11" FontSize="14" Margin="0,14,0,0"
+                                Command="{Binding AnalyzeCommand}" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Classes="card flat">
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="card-title" Text="扫描任务" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="任务编号" />
+                            <TextBlock Grid.Column="1" Text="SC-20261031-012" FontSize="12.5"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="掌子面" />
+                            <TextBlock Grid.Column="1" Text="K2+186.5 左线" FontSize="12.5"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="dim" Text="坐标系" />
+                            <TextBlock Grid.Column="1" Text="掌子面局部坐标" FontSize="12.5"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

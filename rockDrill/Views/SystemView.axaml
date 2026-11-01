@@ -1,0 +1,295 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.SystemView"
+             x:DataType="vm:SystemViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="Border.node">
+            <Setter Property="Background" Value="#101C25" />
+            <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="Padding" Value="8" />
+        </Style>
+        <Style Selector="Border.node TextBlock.n-title">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Border.node TextBlock.n-sub">
+            <Setter Property="FontSize" Value="9.5" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboDim}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="系统监控" />
+                <TextBlock Classes="sub" Text="整车通讯拓扑 · 传感器 · 电气信号" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag ok"><TextBlock Text="11 / 11 节点在线" /></Border>
+                <Border Classes="tag ok"><TextBlock Text="错误帧 0" /></Border>
+                <Border Classes="tag info"><TextBlock Text="刷新 200 ms" /></Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="210,*,352" ColumnSpacing="12">
+
+            <!-- ================= 左：视图切换 ================= -->
+            <StackPanel Grid.Column="0" Spacing="12">
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="card-title" Text="监控视图" />
+                        <ListBox Theme="{StaticResource JumboList}"
+                                 ItemsSource="{Binding NetTabs}"
+                                 SelectedIndex="{Binding SelectedNetTab, Mode=TwoWay}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Border Padding="12,10">
+                                        <TextBlock Text="{Binding}" FontSize="14.5"
+                                                   Foreground="{DynamicResource JumboSub}" />
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <TextBlock Classes="card-title" Text="总线负载" />
+                        <ItemsControl ItemsSource="{Binding CanStats}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SignalVm">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,4">
+                                        <TextBlock Text="{Binding Name}" FontSize="13.5"
+                                                   Foreground="{DynamicResource JumboSub}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding ValueText}" FontSize="13.5"
+                                                   FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{DynamicResource JumboText}" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ================= 中：拓扑 ================= -->
+            <Border Grid.Column="1" Classes="card">
+                <Grid RowDefinitions="Auto,*,Auto">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Classes="card-title" Text="通讯拓扑" VerticalAlignment="Center" />
+                            <Border Classes="tag info"><TextBlock Text="CAN0 / CAN1 / CAN2" /></Border>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboGreen}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="在线" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboRed}" VerticalAlignment="Center" />
+                                <TextBlock Classes="dim" Text="仪表" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="#081016" CornerRadius="10" Margin="0,12,0,0"
+                            BorderBrush="{DynamicResource JumboStroke}" BorderThickness="1" Padding="10">
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="800" Height="400">
+
+                                <!-- 连接线 -->
+                                <Line StartPoint="400,62" EndPoint="400,104" Stroke="#2E4E66" StrokeThickness="1.6" />
+                                <Line StartPoint="400,158" EndPoint="400,206" Stroke="#2E4E66" StrokeThickness="1.6" />
+                                <Line StartPoint="90,206" EndPoint="710,206" Stroke="#23A9F0" StrokeThickness="2" Opacity="0.55" />
+                                <Line StartPoint="95,206" EndPoint="95,226" Stroke="#2E4E66" StrokeThickness="1.4" />
+                                <Line StartPoint="223,206" EndPoint="223,226" Stroke="#2E4E66" StrokeThickness="1.4" />
+                                <Line StartPoint="351,206" EndPoint="351,226" Stroke="#2E4E66" StrokeThickness="1.4" />
+                                <Line StartPoint="479,206" EndPoint="479,226" Stroke="#2E4E66" StrokeThickness="1.4" />
+                                <Line StartPoint="607,206" EndPoint="607,226" Stroke="#2E4E66" StrokeThickness="1.4" />
+                                <Line StartPoint="735,206" EndPoint="735,226" Stroke="#2E4E66" StrokeThickness="1.4" />
+                                <Line StartPoint="223,292" EndPoint="223,326" Stroke="#2E4E66" StrokeThickness="1.4" />
+                                <Line StartPoint="735,292" EndPoint="735,326" Stroke="#2E4E66" StrokeThickness="1.4" />
+
+                                <TextBlock Canvas.Left="408" Canvas.Top="70" Text="CAN0" FontSize="11.5"
+                                           Foreground="{DynamicResource JumboDim}" />
+                                <TextBlock Canvas.Left="408" Canvas.Top="172" Text="CAN 主干" FontSize="11.5"
+                                           Foreground="{DynamicResource JumboDim}" />
+
+                                <!-- 工控机 -->
+                                <Border Classes="node" Canvas.Left="320" Canvas.Top="8" Width="160" Height="54">
+                                    <StackPanel Spacing="3" VerticalAlignment="Center">
+                                        <TextBlock Classes="n-title" Text="工控机 IPC-610" />
+                                        <TextBlock Classes="n-sub" Text="CAN0 / CAN1 / 以太网" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 主控制器 -->
+                                <Border Classes="node" Canvas.Left="320" Canvas.Top="104" Width="160" Height="54"
+                                        BorderBrush="#2B5C7C" Background="#0F222E">
+                                    <StackPanel Spacing="3" VerticalAlignment="Center">
+                                        <TextBlock Classes="n-title" Text="主控制器 0832G" />
+                                        <TextBlock Classes="n-sub" Text="CAN0 / CAN1 / CAN2 / CAN3" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 终端节点 -->
+                                <Border Classes="node" Canvas.Left="40" Canvas.Top="226" Width="110" Height="66">
+                                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboGreen}" />
+                                        <TextBlock Classes="n-title" Text="左臂遥控器" />
+                                        <TextBlock Classes="n-sub" Text="CAN1 · 在线" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="node" Canvas.Left="168" Canvas.Top="226" Width="110" Height="66">
+                                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboGreen}" />
+                                        <TextBlock Classes="n-title" Text="左臂传感器" />
+                                        <TextBlock Classes="n-sub" Text="CAN2 · 在线" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="node" Canvas.Left="296" Canvas.Top="226" Width="110" Height="66">
+                                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboGreen}" />
+                                        <TextBlock Classes="n-title" Text="左操作台" />
+                                        <TextBlock Classes="n-sub" Text="CAN0 · 在线" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="node" Canvas.Left="424" Canvas.Top="226" Width="110" Height="66">
+                                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboGreen}" />
+                                        <TextBlock Classes="n-title" Text="右操作台" />
+                                        <TextBlock Classes="n-sub" Text="CAN0 · 在线" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="node" Canvas.Left="552" Canvas.Top="226" Width="110" Height="66">
+                                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboGreen}" />
+                                        <TextBlock Classes="n-title" Text="右臂传感器" />
+                                        <TextBlock Classes="n-sub" Text="CAN2 · 在线" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="node" Canvas.Left="680" Canvas.Top="226" Width="110" Height="66">
+                                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource JumboGreen}" />
+                                        <TextBlock Classes="n-title" Text="右臂遥控器" />
+                                        <TextBlock Classes="n-sub" Text="CAN1 · 在线" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 倾角传感器 / 数显表 -->
+                                <Border Classes="node" Canvas.Left="168" Canvas.Top="326" Width="110" Height="56">
+                                    <StackPanel Spacing="3" VerticalAlignment="Center">
+                                        <TextBlock Classes="n-title" Text="倾角传感器" />
+                                        <TextBlock Classes="n-sub" Text="RS485 · 在线" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="node" Canvas.Left="680" Canvas.Top="326" Width="110" Height="56"
+                                        BorderBrush="#5A2029" Background="#150F13">
+                                    <StackPanel Spacing="3" VerticalAlignment="Center">
+                                        <TextBlock Classes="n-title" Text="数显表" Foreground="#ED4C5C" />
+                                        <TextBlock Classes="n-sub" Text="CAN1 · 超时 3 次" />
+                                    </StackPanel>
+                                </Border>
+                            </Canvas>
+                        </Viewbox>
+                    </Border>
+
+                    <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*" ColumnSpacing="10" Margin="0,12,0,0">
+                        <StackPanel Spacing="2">
+                            <TextBlock Classes="dim" Text="在线节点" />
+                            <TextBlock Text="11 / 11" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource JumboGreen}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Classes="dim" Text="总线负载" />
+                            <TextBlock Text="32 %" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="2">
+                            <TextBlock Classes="dim" Text="错误帧" />
+                            <TextBlock Text="0" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" Spacing="2">
+                            <TextBlock Classes="dim" Text="平均响应" />
+                            <TextBlock Text="12 ms" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ================= 右：信号表 ================= -->
+            <Border Grid.Column="2" Classes="card">
+                <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="card-title" Text="电气信号" VerticalAlignment="Center" />
+                        <Border Grid.Column="1" Classes="tag ok"><TextBlock Text="实时刷新" /></Border>
+                    </Grid>
+
+                    <ListBox Grid.Row="1" Theme="{StaticResource JumboPillCompact}" Margin="0,10,0,10"
+                             ItemsSource="{Binding SignalTabs}"
+                             SelectedIndex="{Binding SelectedSignalTab, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock Text="{Binding}" FontSize="13" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding SignalItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SignalVm">
+                                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="2,7,2,7">
+                                        <TextBlock Text="{Binding Name}" FontSize="14"
+                                                   Foreground="{DynamicResource JumboSub}" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding ValueText}" FontSize="14.5"
+                                                       FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboText}" />
+                                            <TextBlock Text="{Binding Unit}" FontSize="11.5"
+                                                       Foreground="{DynamicResource JumboDim}"
+                                                       VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                                        </StackPanel>
+                                        <Ellipse Grid.Column="2" Width="6" Height="6" Fill="{Binding Brush}"
+                                                 Margin="12,0,2,0" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="3" Background="#0B151D" CornerRadius="8" Padding="10,8" Margin="0,10,0,0">
+                        <StackPanel Spacing="3">
+                            <TextBlock Classes="dim" Text="{Binding SignalGroupTitle}" />
+                            <TextBlock Classes="dim" TextWrapping="Wrap"
+                                       Text="信号采集周期 200 ms，断线信号保持最后有效值并标记为超时。" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

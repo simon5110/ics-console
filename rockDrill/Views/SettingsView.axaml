@@ -1,0 +1,374 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Padding" Value="14" />
+        </Style>
+        <Style Selector="Border.hr">
+            <Setter Property="Margin" Value="0,6" />
+        </Style>
+        <Style Selector="TextBlock.s-label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.unit">
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboDim}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Width" Value="52" />
+        </Style>
+        <Style Selector="TextBox.num">
+            <Setter Property="Width" Value="76" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="8,2" />
+            <Setter Property="TextAlignment" Value="Right" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="#0B151D" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+        </Style>
+        <Style Selector="Grid.row">
+            <Setter Property="Margin" Value="0,4,0,4" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="参数设置" />
+                <TextBlock Classes="sub" Text="{Binding SaveHint}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag info"><TextBlock Text="管理员权限" /></Border>
+                <Button Theme="{StaticResource JumboButton}" Content="恢复默认" Padding="14,7" FontSize="14"
+                        Command="{Binding RestoreDefaultsCommand}" />
+                <Button Theme="{StaticResource JumboPrimaryButton}" Content="保存参数" Padding="18,7" FontSize="14"
+                        Command="{Binding SaveCommand}" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="300,*" ColumnSpacing="12">
+
+            <!-- ================= 左：设备信息 / 维护 ================= -->
+            <StackPanel Grid.Column="0" Spacing="12">
+                <Border Classes="card">
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="card-title" Text="设备信息" Margin="0,0,0,6" />
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                            <TextBlock Classes="s-label" Text="设备型号" />
+                            <TextBlock Grid.Column="1" Text="{Binding MachineModel}" FontSize="14"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                            <TextBlock Classes="s-label" Text="出厂编号" />
+                            <TextBlock Grid.Column="1" Text="{Binding SerialNo}" FontSize="14"
+                                       FontFamily="Consolas, Menlo, monospace"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                            <TextBlock Classes="s-label" Text="软件版本" />
+                            <TextBlock Grid.Column="1" Text="{Binding SoftwareVersion}" FontSize="13.5"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                            <TextBlock Classes="s-label" Text="控制器固件" />
+                            <TextBlock Grid.Column="1" Text="{Binding FirmwareVersion}" FontSize="13.5"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                            <TextBlock Classes="s-label" Text="累计工时" />
+                            <TextBlock Grid.Column="1" Text="{Binding WorkHours}" FontSize="14"
+                                       Foreground="{DynamicResource JumboText}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                            <TextBlock Classes="s-label" Text="最近保养" />
+                            <TextBlock Grid.Column="1" Text="{Binding LastMaintenance}" FontSize="13.5"
+                                       Foreground="{DynamicResource JumboSub}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <TextBlock Classes="card-title" Text="用户与权限" />
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Border Width="34" Height="34" CornerRadius="17" Background="#16303F">
+                                <TextBlock Text="张" FontSize="16" Foreground="{DynamicResource JumboAccent}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+                                <TextBlock Text="张伟" FontSize="15" Foreground="{DynamicResource JumboText}" />
+                                <TextBlock Classes="dim" Text="设备管理员 · 上次登录 07:52" />
+                            </StackPanel>
+                        </Grid>
+                        <Button Theme="{StaticResource JumboButton}" Content="切换用户 / 注销"
+                                HorizontalAlignment="Stretch" FontSize="14" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="9">
+                        <TextBlock Classes="card-title" Text="维护操作" />
+                        <Button Theme="{StaticResource JumboButton}" Content="备份当前参数" HorizontalAlignment="Stretch" FontSize="14" />
+                        <Button Theme="{StaticResource JumboButton}" Content="导出运行日志" HorizontalAlignment="Stretch" FontSize="14" />
+                        <Button Theme="{StaticResource JumboButton}" Content="控制器固件升级" HorizontalAlignment="Stretch" FontSize="14" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ================= 右：参数分组 ================= -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+
+                    <!-- 凿岩参数 -->
+                    <Border Grid.Column="0" Grid.Row="0" Classes="card">
+                        <StackPanel>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="3" Height="14" CornerRadius="2" Background="{DynamicResource JumboAccent}"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock Classes="section" Text="凿岩参数" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Classes="dim" Text="下一循环生效"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                            <Border Classes="hr" />
+
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="冲击压力上限" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding ImpactMax}" />
+                                    <TextBlock Classes="unit" Text="MPa" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="回转压力上限" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding RotationMax}" />
+                                    <TextBlock Classes="unit" Text="MPa" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="推进压力上限" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding FeedMax}" />
+                                    <TextBlock Classes="unit" Text="MPa" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="冲洗水压下限" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding WaterMin}" />
+                                    <TextBlock Classes="unit" Text="MPa" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="自动退钎延时" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding RetractDelay}" />
+                                    <TextBlock Classes="unit" Text="s" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="单孔超时时间" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding HoleTimeout}" />
+                                    <TextBlock Classes="unit" Text="s" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Classes="hr" />
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Classes="s-label" Text="夹钎自动退钎" />
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoRetract}" OnContent="开" OffContent="关" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Classes="s-label" Text="压力自适应钻进" />
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding AdaptivePressure}" OnContent="开" OffContent="关" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 臂架限位 -->
+                    <Border Grid.Column="1" Grid.Row="0" Classes="card">
+                        <StackPanel>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="3" Height="14" CornerRadius="2" Background="{DynamicResource JumboCyan}"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock Classes="section" Text="臂架限位" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Classes="dim" Text="软限位 · 双重保护"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                            <Border Classes="hr" />
+
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="回转左右限位" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding SwingLimit}" Width="96" />
+                                    <TextBlock Classes="unit" Text="°" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="俯仰上下限位" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding PitchLimit}" Width="96" />
+                                    <TextBlock Classes="unit" Text="°" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="直臂最大行程" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding TelescopeMax}" />
+                                    <TextBlock Classes="unit" Text="mm" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="补偿最大行程" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding CompensateMax}" />
+                                    <TextBlock Classes="unit" Text="mm" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Classes="hr" />
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Classes="s-label" Text="双臂防碰撞" />
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding AntiCollision}" OnContent="开" OffContent="关" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Classes="s-label" Text="接近限位减速" />
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding SlowZone}" OnContent="开" OffContent="关" />
+                            </Grid>
+
+                            <Border Background="#0B151D" CornerRadius="8" Padding="10,8" Margin="0,10,0,0">
+                                <TextBlock Classes="dim" TextWrapping="Wrap"
+                                           Text="限位修改后需执行一次全行程低速校验，校验通过方可投入自动钻孔。" />
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 传感器标定 -->
+                    <Border Grid.Column="0" Grid.Row="1" Classes="card">
+                        <StackPanel>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="3" Height="14" CornerRadius="2" Background="{DynamicResource JumboViolet}"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock Classes="section" Text="传感器标定" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Classes="dim" Text="{Binding CalibDate}"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                            <Border Classes="hr" />
+
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="左臂倾角零点" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding LeftTiltZero}" />
+                                    <TextBlock Classes="unit" Text="°" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="右臂倾角零点" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding RightTiltZero}" />
+                                    <TextBlock Classes="unit" Text="°" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="压力传感器增益" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding PressureGain}" />
+                                    <TextBlock Classes="unit" Text="×" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="s-label" Text="位移传感器量程" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <TextBox Classes="num" Text="{Binding DisplacementRange}" />
+                                    <TextBlock Classes="unit" Text="mm" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Classes="hr" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Button Grid.Column="0" Theme="{StaticResource JumboButton}" Content="零点标定"
+                                        HorizontalAlignment="Stretch" FontSize="14" />
+                                <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="量程标定"
+                                        HorizontalAlignment="Stretch" FontSize="14" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 网络与通讯 -->
+                    <Border Grid.Column="1" Grid.Row="1" Classes="card">
+                        <StackPanel>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="3" Height="14" CornerRadius="2" Background="{DynamicResource JumboGreen}"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock Classes="section" Text="网络与通讯" />
+                                </StackPanel>
+                                <Border Grid.Column="1" Classes="tag ok" HorizontalAlignment="Right">
+                                    <TextBlock Text="已连接" />
+                                </Border>
+                            </Grid>
+                            <Border Classes="hr" />
+
+                            <Grid Classes="row" ColumnDefinitions="82,*">
+                                <TextBlock Classes="s-label" Text="本机 IP" />
+                                <TextBox Grid.Column="1" Text="{Binding LocalIp}" FontSize="14"
+                                         Background="#0B151D" Foreground="{DynamicResource JumboText}"
+                                         BorderBrush="{DynamicResource JumboStroke}" Height="28" MinHeight="28" />
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="82,*">
+                                <TextBlock Classes="s-label" Text="默认网关" />
+                                <TextBox Grid.Column="1" Text="{Binding Gateway}" FontSize="14"
+                                         Background="#0B151D" Foreground="{DynamicResource JumboText}"
+                                         BorderBrush="{DynamicResource JumboStroke}" Height="28" MinHeight="28" />
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="82,*">
+                                <TextBlock Classes="s-label" Text="MES 服务" />
+                                <TextBox Grid.Column="1" Text="{Binding MesAddress}" FontSize="14"
+                                         Background="#0B151D" Foreground="{DynamicResource JumboText}"
+                                         BorderBrush="{DynamicResource JumboStroke}" Height="28" MinHeight="28" />
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="82,*">
+                                <TextBlock Classes="s-label" Text="CAN 波特率" />
+                                <TextBox Grid.Column="1" Text="{Binding CanBitrate}" FontSize="14"
+                                         Background="#0B151D" Foreground="{DynamicResource JumboText}"
+                                         BorderBrush="{DynamicResource JumboStroke}" Height="28" MinHeight="28" />
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="82,*">
+                                <TextBlock Classes="s-label" Text="上传周期" />
+                                <TextBox Grid.Column="1" Text="{Binding UploadPeriod}" FontSize="14"
+                                         Background="#0B151D" Foreground="{DynamicResource JumboText}"
+                                         BorderBrush="{DynamicResource JumboStroke}" Height="28" MinHeight="28" />
+                            </Grid>
+
+                            <Border Classes="hr" />
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Classes="s-label" Text="运行数据上传云平台" />
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding CloudSync}" OnContent="开" OffContent="关" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

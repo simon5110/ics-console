@@ -1,0 +1,219 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:rockDrill.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
+             x:Class="rockDrill.Views.AlarmView"
+             x:DataType="vm:AlarmViewModel">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- ================= 页头 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="3">
+                <TextBlock Classes="page-title" Text="告警中心" />
+                <TextBlock Classes="sub" Text="{Binding SummaryText}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Classes="tag bad">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="紧急" />
+                        <TextBlock Text="{Binding UrgentCount}" />
+                    </StackPanel>
+                </Border>
+                <Border Classes="tag warn">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="严重" />
+                        <TextBlock Text="{Binding SeriousCount}" />
+                    </StackPanel>
+                </Border>
+                <Border Classes="tag">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="一般" />
+                        <TextBlock Text="{Binding NormalCount}" />
+                    </StackPanel>
+                </Border>
+                <Border Classes="tag info">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="提示" />
+                        <TextBlock Text="{Binding InfoCount}" />
+                    </StackPanel>
+                </Border>
+                <Button Theme="{StaticResource JumboButton}" Content="导出记录" Padding="14,6" FontSize="14" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,346" ColumnSpacing="12">
+
+            <!-- ================= 告警列表 ================= -->
+            <Border Grid.Column="0" Classes="card">
+                <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                    <!-- 统计条 -->
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+                        <Border Background="#180E10" CornerRadius="9" Padding="12,9">
+                            <StackPanel Spacing="2">
+                                <TextBlock Classes="dim" Text="紧急" />
+                                <TextBlock Text="{Binding UrgentCount}" FontSize="23" FontWeight="Bold"
+                                           Foreground="#FF4D4F" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="#1A1210" CornerRadius="9" Padding="12,9">
+                            <StackPanel Spacing="2">
+                                <TextBlock Classes="dim" Text="严重" />
+                                <TextBlock Text="{Binding SeriousCount}" FontSize="23" FontWeight="Bold"
+                                           Foreground="{DynamicResource JumboRed}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="#1A1610" CornerRadius="9" Padding="12,9">
+                            <StackPanel Spacing="2">
+                                <TextBlock Classes="dim" Text="一般" />
+                                <TextBlock Text="{Binding NormalCount}" FontSize="23" FontWeight="Bold"
+                                           Foreground="{DynamicResource JumboAmber}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="3" Background="#0F1A22" CornerRadius="9" Padding="12,9">
+                            <StackPanel Spacing="2">
+                                <TextBlock Classes="dim" Text="提示" />
+                                <TextBlock Text="{Binding InfoCount}" FontSize="23" FontWeight="Bold"
+                                           Foreground="{DynamicResource JumboAccent}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- 列头 -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*,120,92" Margin="26,14,14,8">
+                        <TextBlock Classes="dim" Text="告警内容" />
+                        <TextBlock Grid.Column="1" Classes="dim" Text="来源" />
+                        <TextBlock Grid.Column="2" Classes="dim" Text="时间" HorizontalAlignment="Right" />
+                    </Grid>
+
+                    <!-- 列表 -->
+                    <ListBox Grid.Row="2" Name="AlarmList" Theme="{StaticResource JumboList}"
+                             ItemsSource="{Binding Alarms}"
+                             SelectedItem="{Binding SelectedAlarm, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AlarmVm">
+                                <Border Background="#101C25" CornerRadius="8" Padding="12,10">
+                                    <Grid ColumnDefinitions="4,*,120,92">
+                                        <Border Width="4" CornerRadius="2" Background="{Binding Brush}" />
+                                        <StackPanel Grid.Column="1" Spacing="3" Margin="10,0,10,0">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Border Classes="tag" Background="#141F27">
+                                                    <TextBlock Text="{Binding Level}" Foreground="{Binding Brush}" />
+                                                </Border>
+                                                <TextBlock Text="{Binding Message}" FontSize="14.5"
+                                                           Foreground="{DynamicResource JumboText}"
+                                                           VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Code}" FontSize="12.5"
+                                                       FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboDim}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding Source}" FontSize="13.5"
+                                                   Foreground="{DynamicResource JumboSub}"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="3" Text="{Binding Time}" FontSize="13.5"
+                                                   FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{DynamicResource JumboSub}"
+                                                   VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="2,10,2,0">
+                        <TextBlock Classes="dim" Text="告警记录保存 30 天，可导出 CSV 用于班后分析" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <Button Theme="{StaticResource JumboButton}" Content="全部确认" Padding="14,6" FontSize="14"
+                                    Command="{Binding ClearAllCommand}" />
+                            <Button Theme="{StaticResource JumboButton}" Content="筛选" Padding="14,6" FontSize="14" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ================= 详情 ================= -->
+            <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="12">
+
+                <Border Grid.Row="0" Classes="card">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="card-title" Text="告警详情" VerticalAlignment="Center" />
+                                <Border Grid.Column="1" Classes="tag bad" Background="#2A1216">
+                                    <TextBlock Text="{Binding SelectedAlarm.Level}"
+                                               Foreground="{Binding SelectedAlarm.Brush}" />
+                                </Border>
+                            </Grid>
+
+                            <TextBlock Text="{Binding SelectedAlarm.Code}" FontSize="25" FontWeight="Bold"
+                                       FontFamily="Consolas, Menlo, monospace"
+                                       Foreground="{DynamicResource JumboText}" />
+
+                            <TextBlock Text="{Binding SelectedAlarm.Message}" FontSize="16"
+                                       Foreground="{DynamicResource JumboText}" TextWrapping="Wrap" />
+
+                            <Border Classes="hr" />
+
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,2">
+                                <TextBlock Classes="dim" Text="发生时间" />
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedAlarm.Time}" FontSize="14"
+                                           FontFamily="Consolas, Menlo, monospace"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="dim" Text="告警来源" />
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedAlarm.Source}" FontSize="14"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="dim" Text="处理状态" />
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedAlarm.State}" FontSize="14"
+                                           Foreground="{DynamicResource JumboAmber}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="dim" Text="关联工位" />
+                                <TextBlock Grid.Column="1" Text="左臂 BOOM-A" FontSize="14"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="dim" Text="重复次数" />
+                                <TextBlock Grid.Column="1" Text="3 次 / 2 h" FontSize="14"
+                                           Foreground="{DynamicResource JumboText}" />
+                            </Grid>
+
+                            <Border Classes="hr" />
+
+                            <TextBlock Classes="card-title" Text="处理建议" />
+                            <TextBlock Text="{Binding SelectedAlarm.Advice}" FontSize="14"
+                                       Foreground="{DynamicResource JumboSub}" TextWrapping="Wrap"
+                                       LineHeight="19" />
+
+                            <Border Background="#0B151D" CornerRadius="8" Padding="10,8">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Classes="dim" Text="安全提示" Foreground="{DynamicResource JumboAmber}" />
+                                    <TextBlock Classes="dim" TextWrapping="Wrap"
+                                               Text="进入臂架作业范围前须停止自动钻孔、切断回转动力并挂牌上锁。" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <StackPanel Grid.Row="1" Spacing="8">
+                    <Button Theme="{StaticResource JumboPrimaryButton}" Content="确认告警"
+                            HorizontalAlignment="Stretch" Command="{Binding ConfirmSelectedCommand}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Theme="{StaticResource JumboButton}" Content="复位信号"
+                                HorizontalAlignment="Stretch" />
+                        <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="查看历史"
+                                HorizontalAlignment="Stretch" />
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

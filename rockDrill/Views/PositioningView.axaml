@@ -3,154 +3,298 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:rockDrill.ViewModels"
+             xmlns:myControls="clr-namespace:rockDrill.MyControls"
              mc:Ignorable="d" d:DesignWidth="1570" d:DesignHeight="740"
              x:Class="rockDrill.Views.PositioningView"
              x:DataType="vm:PositioningViewModel">
 
     <UserControl.Styles>
         <Style Selector="TextBlock.axis">
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="13.5" />
             <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style Selector="TextBox.coord">
             <Setter Property="FontSize" Value="15" />
-            <Setter Property="Height" Value="34" />
-            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="MinHeight" Value="36" />
             <Setter Property="Padding" Value="10,4" />
             <Setter Property="FontFamily" Value="Consolas, Menlo, monospace" />
             <Setter Property="Background" Value="#0B151D" />
             <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
             <Setter Property="BorderBrush" Value="{DynamicResource JumboStroke}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <!-- 左 / 右列的竖排功能按钮（对齐现场 HMI 的样式） -->
+        <Style Selector="Button.rail">
+            <Setter Property="Height" Value="88" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Padding" Value="0" />
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+    <Grid RowDefinitions="Auto,*" RowSpacing="10">
 
-        <!-- ================= 页头 ================= -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-            <StackPanel Spacing="3">
-                <TextBlock Classes="page-title" Text="全站仪定位" />
-                <TextBlock Classes="sub" Text="后方交会定位 · 隧道中线校核" />
-            </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <!-- ================= 标题 ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
+            <TextBlock Grid.Column="1" Text="{Binding TitleText}" FontSize="24" FontWeight="SemiBold"
+                       Foreground="{DynamicResource JumboText}" HorizontalAlignment="Center" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
                 <Border Classes="tag ok" IsVisible="{Binding IsLocated}"><TextBlock Text="{Binding StatusText}" /></Border>
                 <Border Classes="tag warn" IsVisible="{Binding !IsLocated}"><TextBlock Text="{Binding StatusText}" /></Border>
-                <Border Classes="tag">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <TextBlock Text="里程" />
-                        <TextBlock Text="{Binding ChainageText}" />
-                    </StackPanel>
-                </Border>
+                <Border Classes="tag"><TextBlock Text="{Binding ChainageText}" /></Border>
                 <Border Classes="tag info"><TextBlock Text="后视棱镜 2" /></Border>
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="1" ColumnDefinitions="176,*,176" ColumnSpacing="12">
+        <Grid Grid.Row="1" ColumnDefinitions="112,*,112" ColumnSpacing="10">
 
-            <!-- ================= 左：功能 ================= -->
-            <Border Grid.Column="0" Classes="card">
-                <StackPanel Spacing="9">
-                    <TextBlock Classes="card-title" Text="标定功能" Margin="0,0,0,2" />
-                    <Button Theme="{StaticResource JumboButton}" Content="棱镜标定" HorizontalAlignment="Stretch" />
-                    <Button Theme="{StaticResource JumboButton}" Content="隧道线设置" HorizontalAlignment="Stretch" />
-                    <Button Theme="{StaticResource JumboButton}" Content="坐标系转换" HorizontalAlignment="Stretch" />
-                    <Button Theme="{StaticResource JumboButton}" Content="定位记录" HorizontalAlignment="Stretch" />
-                    <Border Classes="hr" />
-                    <TextBlock Classes="card-title" Text="隧道线参数" />
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Classes="dim" Text="当前里程" />
-                        <TextBlock Grid.Column="1" Text="{Binding ChainageText}" FontSize="13"
-                                   Foreground="{DynamicResource JumboText}" />
-                    </Grid>
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Classes="dim" Text="中线方位" />
-                        <TextBlock Grid.Column="1" Text="{Binding AzimuthText}" FontSize="12.5"
-                                   Foreground="{DynamicResource JumboText}" />
-                    </Grid>
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Classes="dim" Text="线路坡度" />
-                        <TextBlock Grid.Column="1" Text="{Binding SlopeText}" FontSize="12.5"
-                                   Foreground="{DynamicResource JumboText}" />
-                    </Grid>
-                </StackPanel>
-            </Border>
+            <!-- ================= 左列：标定 / 隧道线 / 返回 ================= -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*,Auto">
+                <Button Theme="{StaticResource JumboButton}" Classes="rail" Content="标　定"
+                        Command="{Binding OpenCalibrationCommand}" />
+                <Button Grid.Row="1" Theme="{StaticResource JumboButton}" Classes="rail" Content="隧道线"
+                        Margin="0,10,0,0" Command="{Binding OpenTunnelLineCommand}" />
+                <Button Grid.Row="3" Theme="{StaticResource JumboButton}" Classes="rail" Content="返　回"
+                        Command="{Binding BackCommand}" />
+            </Grid>
 
-            <!-- ================= 中：棱镜坐标 ================= -->
-            <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="12">
+            <!-- ================= 中间：两种定位视图 ================= -->
+            <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="10">
 
-                <Border Grid.Row="0" Classes="card">
-                    <Grid RowDefinitions="Auto,*,Auto">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Classes="card-title" Text="后视棱镜坐标（大地坐标）" VerticalAlignment="Center" />
-                            <Border Grid.Column="1" Classes="tag info"><TextBlock Text="单位：m" /></Border>
+                <Border Grid.Row="0" Classes="card" Padding="10">
+                    <Grid>
+
+                        <!-- 全站仪定位 -->
+                        <Grid IsVisible="{Binding IsStationView}" RowDefinitions="*,Auto">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="18">
+
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Width="820">
+                                    <!-- 左后方棱镜 -->
+                                    <Border Background="#0F1B24" BorderBrush="{DynamicResource JumboStroke}"
+                                            BorderThickness="1" CornerRadius="10" Padding="16">
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Border Width="3" Height="14" CornerRadius="2"
+                                                        Background="{DynamicResource JumboAccent}" VerticalAlignment="Center" />
+                                                <TextBlock Classes="section" Text="左后方棱镜" />
+                                            </StackPanel>
+                                            <Grid ColumnDefinitions="86,*,34" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                                                <TextBlock Classes="axis" Text="X (E)" />
+                                                <TextBox Grid.Column="1" Classes="coord" Text="{Binding LeftX}" />
+                                                <TextBlock Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+
+                                                <TextBlock Grid.Row="1" Classes="axis" Text="Y (N)" />
+                                                <TextBox Grid.Row="1" Grid.Column="1" Classes="coord" Text="{Binding LeftY}" />
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+
+                                                <TextBlock Grid.Row="2" Classes="axis" Text="Z (H)" />
+                                                <TextBox Grid.Row="2" Grid.Column="1" Classes="coord" Text="{Binding LeftZ}" />
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- 右后方棱镜 -->
+                                    <Border Grid.Column="1" Background="#0F1B24"
+                                            BorderBrush="{DynamicResource JumboStroke}"
+                                            BorderThickness="1" CornerRadius="10" Padding="16">
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Border Width="3" Height="14" CornerRadius="2"
+                                                        Background="{DynamicResource JumboViolet}" VerticalAlignment="Center" />
+                                                <TextBlock Classes="section" Text="右后方棱镜" />
+                                            </StackPanel>
+                                            <Grid ColumnDefinitions="86,*,34" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                                                <TextBlock Classes="axis" Text="X (E)" />
+                                                <TextBox Grid.Column="1" Classes="coord" Text="{Binding RightX}" />
+                                                <TextBlock Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+
+                                                <TextBlock Grid.Row="1" Classes="axis" Text="Y (N)" />
+                                                <TextBox Grid.Row="1" Grid.Column="1" Classes="coord" Text="{Binding RightY}" />
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+
+                                                <TextBlock Grid.Row="2" Classes="axis" Text="Z (H)" />
+                                                <TextBox Grid.Row="2" Grid.Column="1" Classes="coord" Text="{Binding RightZ}" />
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="18">
+                                    <Button Theme="{StaticResource JumboButton}" Content="重　置" Width="170" Height="46"
+                                            FontSize="16" Command="{Binding ResetCommand}" />
+                                    <Button Theme="{StaticResource JumboPrimaryButton}" Content="定　位" Width="170" Height="46"
+                                            FontSize="16" Command="{Binding LocateCommand}" />
+                                </StackPanel>
+                            </StackPanel>
                         </Grid>
 
-                        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="14" Margin="0,14,0,0">
+                        <!-- 臂架定位 -->
+                        <Grid IsVisible="{Binding IsArmView}" ColumnDefinitions="*,280" ColumnSpacing="12">
 
-                            <Border Background="#0F1B24" BorderBrush="{DynamicResource JumboStroke}"
-                                    BorderThickness="1" CornerRadius="10" Padding="16">
-                                <StackPanel Spacing="12">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Border Width="3" Height="14" CornerRadius="2"
-                                                Background="{DynamicResource JumboAccent}" VerticalAlignment="Center" />
-                                        <TextBlock Classes="section" Text="左后方棱镜" />
-                                    </StackPanel>
-
-                                    <Grid ColumnDefinitions="96,*,30" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
-                                        <TextBlock Classes="axis" Text="X (E)" />
-                                        <TextBox Grid.Column="1" Classes="coord" Text="{Binding LeftX}" />
-                                        <TextBlock Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
-
-                                        <TextBlock Grid.Row="1" Classes="axis" Text="Y (N)" />
-                                        <TextBox Grid.Row="1" Grid.Column="1" Classes="coord" Text="{Binding LeftY}" />
-                                        <TextBlock Grid.Row="1" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
-
-                                        <TextBlock Grid.Row="2" Classes="axis" Text="Z (H)" />
-                                        <TextBox Grid.Row="2" Grid.Column="1" Classes="coord" Text="{Binding LeftZ}" />
-                                        <TextBlock Grid.Row="2" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
-                                    </Grid>
-                                </StackPanel>
+                            <Border Background="#081016" CornerRadius="10" BorderThickness="1"
+                                    BorderBrush="{DynamicResource JumboStroke}" Padding="4">
+                                <myControls:ArmSchematicCanvas Section="{Binding Section}"
+                                                               Depth="{Binding SchematicDepth}"
+                                                               Arms="{Binding Arms}"
+                                                               Revision="{Binding CanvasRevision}" />
                             </Border>
 
-                            <Border Grid.Column="1" Background="#0F1B24" BorderBrush="{DynamicResource JumboStroke}"
-                                    BorderThickness="1" CornerRadius="10" Padding="16">
-                                <StackPanel Spacing="12">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Border Width="3" Height="14" CornerRadius="2"
-                                                Background="{DynamicResource JumboViolet}" VerticalAlignment="Center" />
-                                        <TextBlock Classes="section" Text="右后方棱镜" />
+                            <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" RowSpacing="10">
+                                <Border Classes="card flat" Padding="12">
+                                    <StackPanel Spacing="10">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                            <TextBlock Classes="axis" Text="台车里程" />
+                                            <TextBox Grid.Column="1" Classes="coord" Text="{Binding TrolleyChainage}" />
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <TextBlock Classes="axis" Text="掌子面里程" />
+                                            <TextBlock Grid.Column="1" Text="{Binding FaceChainage}" FontSize="15"
+                                                       FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboAccent}"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <TextBlock Classes="axis" Text="掌子面距离" />
+                                            <TextBlock Grid.Column="1" Text="{Binding FaceDistance, StringFormat='{}{0:F2} m'}"
+                                                       FontSize="14" FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboText}"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
                                     </StackPanel>
+                                </Border>
 
-                                    <Grid ColumnDefinitions="96,*,30" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
-                                        <TextBlock Classes="axis" Text="X (E)" />
-                                        <TextBox Grid.Column="1" Classes="coord" Text="{Binding RightX}" />
-                                        <TextBlock Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+                                <Border Grid.Row="1" Classes="card" Padding="12">
+                                    <StackPanel Spacing="12">
+                                        <TextBlock Classes="card-title" Text="执行臂架" />
+                                        <ListBox Theme="{StaticResource JumboPillList}"
+                                                 ItemsSource="{Binding ArmOptions}"
+                                                 SelectedIndex="{Binding SelectedArmIndex, Mode=TwoWay}" />
+                                        <Border Classes="hr" />
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Classes="axis" Text="臂架偏差" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ArmOffsetText}" FontSize="14"
+                                                       FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboGreen}"
+                                                       VerticalAlignment="Center" />
+                                        </Grid>
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Classes="axis" Text="点位偏差" />
+                                            <TextBlock Grid.Column="1" Text="{Binding DeviationText}" FontSize="14"
+                                                       FontFamily="Consolas, Menlo, monospace"
+                                                       Foreground="{DynamicResource JumboText}"
+                                                       VerticalAlignment="Center" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
 
-                                        <TextBlock Grid.Row="1" Classes="axis" Text="Y (N)" />
-                                        <TextBox Grid.Row="1" Grid.Column="1" Classes="coord" Text="{Binding RightY}" />
-                                        <TextBlock Grid.Row="1" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+                                <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
+                                    <Button Theme="{StaticResource JumboButton}" Content="重　置" Height="46"
+                                            FontSize="15" HorizontalAlignment="Stretch"
+                                            Command="{Binding ResetCommand}" />
+                                    <Button Grid.Column="1" Theme="{StaticResource JumboPrimaryButton}" Content="定　位"
+                                            Height="46" FontSize="15" HorizontalAlignment="Stretch"
+                                            Command="{Binding LocateCommand}" />
+                                </Grid>
+                            </Grid>
+                        </Grid>
 
-                                        <TextBlock Grid.Row="2" Classes="axis" Text="Z (H)" />
-                                        <TextBox Grid.Row="2" Grid.Column="1" Classes="coord" Text="{Binding RightZ}" />
-                                        <TextBlock Grid.Row="2" Grid.Column="2" Classes="axis" Text="m" Margin="8,0,0,0" />
+                        <!-- 弹出面板：标定 / 隧道线 / 全站仪 -->
+                        <Border IsVisible="{Binding IsPanelOpen}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Width="560" Background="#E60E1720" CornerRadius="12"
+                                BorderBrush="{DynamicResource JumboAccentDeep}" BorderThickness="1"
+                                BoxShadow="0 0 40 0 #88040A0E" Padding="18">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="{Binding PanelTitle}" FontSize="17" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource JumboText}" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="关闭"
+                                            Padding="14,4" FontSize="13" Command="{Binding ClosePanelCommand}" />
+                                </Grid>
+                                <Border Classes="hr" Margin="0,0,0,2" />
+
+                                <!-- 标定 -->
+                                <StackPanel Spacing="10" IsVisible="{Binding IsCalibPanel}">
+                                    <Grid ColumnDefinitions="130,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                                        <TextBlock Classes="axis" Text="棱镜常数 (mm)" />
+                                        <TextBox Grid.Column="1" Classes="coord" Text="{Binding CalibPrismConst}" />
+
+                                        <TextBlock Grid.Row="1" Classes="axis" Text="已知距离 (m)" />
+                                        <TextBox Grid.Row="1" Grid.Column="1" Classes="coord" Text="{Binding CalibKnownDistance}" />
+
+                                        <TextBlock Grid.Row="2" Classes="axis" Text="实测距离 (m)" />
+                                        <TextBox Grid.Row="2" Grid.Column="1" Classes="coord" Text="{Binding CalibMeasuredDistance}" />
                                     </Grid>
+                                    <Border Background="#0B151D" CornerRadius="8" Padding="12,9">
+                                        <TextBlock Text="{Binding CalibResultText}" FontSize="13.5"
+                                                   FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{DynamicResource JumboGreen}" TextWrapping="Wrap" />
+                                    </Border>
+                                    <Button Theme="{StaticResource JumboPrimaryButton}" Content="应用标定"
+                                            HorizontalAlignment="Stretch" Padding="0,10"
+                                            Command="{Binding ApplyCalibrationCommand}" />
                                 </StackPanel>
-                            </Border>
-                        </Grid>
 
-                        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" Margin="0,18,0,0">
-                            <Button Theme="{StaticResource JumboButton}" Content="重 置" Width="160" Height="42"
-                                    HorizontalAlignment="Center" Command="{Binding ResetCommand}" />
-                            <Button Grid.Column="2" Theme="{StaticResource JumboPrimaryButton}" Content="定 位"
-                                    Width="160" Height="42" HorizontalAlignment="Center"
-                                    Command="{Binding LocateCommand}" />
-                        </Grid>
+                                <!-- 隧道线 -->
+                                <StackPanel Spacing="10" IsVisible="{Binding IsLinePanel}">
+                                    <Grid ColumnDefinitions="130,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="9">
+                                        <TextBlock Classes="axis" Text="线路名称" />
+                                        <TextBox Grid.Column="1" Classes="coord" Text="{Binding EditLineName}" />
+
+                                        <TextBlock Grid.Row="1" Classes="axis" Text="当前里程" />
+                                        <TextBox Grid.Row="1" Grid.Column="1" Classes="coord" Text="{Binding EditChainage}" />
+
+                                        <TextBlock Grid.Row="2" Classes="axis" Text="中线方位 (°)" />
+                                        <TextBox Grid.Row="2" Grid.Column="1" Classes="coord" Text="{Binding EditAzimuth}" />
+
+                                        <TextBlock Grid.Row="3" Classes="axis" Text="线路坡度 (%)" />
+                                        <TextBox Grid.Row="3" Grid.Column="1" Classes="coord" Text="{Binding EditSlope}" />
+
+                                        <TextBlock Grid.Row="4" Classes="axis" Text="断面跨度 (m)" />
+                                        <TextBox Grid.Row="4" Grid.Column="1" Classes="coord" Text="{Binding EditSpan}" />
+
+                                        <TextBlock Grid.Row="5" Classes="axis" Text="断面净高 (m)" />
+                                        <TextBox Grid.Row="5" Grid.Column="1" Classes="coord" Text="{Binding EditHeight}" />
+                                    </Grid>
+                                    <Button Theme="{StaticResource JumboPrimaryButton}" Content="保存隧道线参数"
+                                            HorizontalAlignment="Stretch" Padding="0,10"
+                                            Command="{Binding ApplyTunnelLineCommand}" />
+                                </StackPanel>
+
+                                <!-- 全站仪 -->
+                                <StackPanel Spacing="8" IsVisible="{Binding IsInstrumentPanel}">
+                                    <ItemsControl ItemsSource="{Binding PanelLines}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:InfoLineVm">
+                                                <Grid ColumnDefinitions="120,*,Auto" Margin="0,4">
+                                                    <TextBlock Text="{Binding Label}" FontSize="13"
+                                                               Foreground="{DynamicResource JumboSub}"
+                                                               VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="13.5"
+                                                               FontFamily="Consolas, Menlo, monospace"
+                                                               Foreground="{DynamicResource JumboText}"
+                                                               VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding Note}" FontSize="11.5"
+                                                               Foreground="{DynamicResource JumboDim}"
+                                                               VerticalAlignment="Center" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
                     </Grid>
                 </Border>
 
+                <!-- ================= 状态条 ================= -->
                 <Border Grid.Row="1" Classes="card flat">
-                    <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto">
+                    <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,1.4*">
                         <StackPanel Spacing="2">
                             <TextBlock Classes="dim" Text="定位状态" />
                             <TextBlock Text="{Binding StatusText}" FontSize="15" FontWeight="SemiBold"
@@ -166,49 +310,30 @@
                         <Border Grid.Column="3" Width="1" Background="{DynamicResource JumboStroke}" Margin="0,2" />
                         <StackPanel Grid.Column="4" Spacing="2" Margin="18,0,0,0">
                             <TextBlock Classes="dim" Text="最后定位时间" />
-                            <TextBlock Text="{Binding LastTimeText}" FontSize="14"
+                            <TextBlock Text="{Binding LastTimeText}" FontSize="13.5"
                                        FontFamily="Consolas, Menlo, monospace"
                                        Foreground="{DynamicResource JumboText}" />
                         </StackPanel>
-                        <StackPanel Grid.Column="5" Spacing="2" Margin="18,0,0,0">
-                            <TextBlock Classes="dim" Text="交会方式" />
-                            <TextBlock Text="两点后方交会" FontSize="14" Foreground="{DynamicResource JumboText}" />
+                        <Border Grid.Column="5" Width="1" Background="{DynamicResource JumboStroke}" Margin="0,2" />
+                        <StackPanel Grid.Column="6" Spacing="2" Margin="18,0,0,0">
+                            <TextBlock Classes="dim" Text="提示" />
+                            <TextBlock Text="{Binding HintText}" FontSize="12.5"
+                                       Foreground="{DynamicResource JumboSub}"
+                                       TextTrimming="CharacterEllipsis" MaxLines="1" />
                         </StackPanel>
                     </Grid>
                 </Border>
             </Grid>
 
-            <!-- ================= 右：仪器 ================= -->
-            <Border Grid.Column="2" Classes="card">
-                <StackPanel Spacing="9">
-                    <TextBlock Classes="card-title" Text="仪器与动作" Margin="0,0,0,2" />
-                    <Button Theme="{StaticResource JumboPrimaryButton}" Content="全站仪" HorizontalAlignment="Stretch" />
-                    <Button Theme="{StaticResource JumboButton}" Content="快速定位" HorizontalAlignment="Stretch"
-                            Command="{Binding QuickLocateCommand}" />
-                    <Button Theme="{StaticResource JumboButton}" Content="照准检查" HorizontalAlignment="Stretch" />
-                    <Button Theme="{StaticResource JumboButton}" Content="确认" HorizontalAlignment="Stretch" />
-                    <Border Classes="hr" />
-                    <TextBlock Classes="card-title" Text="全站仪状态" />
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Classes="dim" Text="通讯" />
-                        <TextBlock Grid.Column="1" Text="正常" FontSize="12.5"
-                                   Foreground="{DynamicResource JumboGreen}" />
-                    </Grid>
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Classes="dim" Text="电量" />
-                        <TextBlock Grid.Column="1" Text="86 %" FontSize="12.5"
-                                   Foreground="{DynamicResource JumboText}" />
-                    </Grid>
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Classes="dim" Text="测距模式" />
-                        <TextBlock Grid.Column="1" Text="棱镜 ±1 mm" FontSize="12.5"
-                                   Foreground="{DynamicResource JumboText}" />
-                    </Grid>
-                    <Border Background="#0B151D" CornerRadius="8" Padding="10,8" Margin="0,4,0,0">
-                        <TextBlock Classes="dim" TextWrapping="Wrap" Text="{Binding HintText}" />
-                    </Border>
-                </StackPanel>
-            </Border>
+            <!-- ================= 右列：全站仪 / 快速定位 / 确认 ================= -->
+            <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*,Auto">
+                <Button Theme="{StaticResource JumboPrimaryButton}" Classes="rail" Content="全站仪"
+                        Command="{Binding OpenInstrumentCommand}" />
+                <Button Grid.Row="1" Theme="{StaticResource JumboButton}" Classes="rail" Content="快速定位"
+                        Margin="0,10,0,0" Command="{Binding QuickLocateCommand}" />
+                <Button Grid.Row="3" Theme="{StaticResource JumboButton}" Classes="rail" Content="确　认"
+                        Command="{Binding ConfirmCommand}" />
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

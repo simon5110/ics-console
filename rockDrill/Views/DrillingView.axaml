@@ -8,330 +8,300 @@
              x:Class="rockDrill.Views.DrillingView"
              x:DataType="vm:DrillingViewModel">
 
-    <UserControl.Styles>
-        <Style Selector="TextBlock.k">
-            <Setter Property="FontSize" Value="12" />
+    <UserControl.Resources>
+        <!-- 左侧四个视图按钮（竖向堆叠，选中高亮） -->
+        <ControlTheme x:Key="ViewTabItem" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="#12212C" />
             <Setter Property="Foreground" Value="{DynamicResource JumboSub}" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="TextBlock.v">
-            <Setter Property="FontSize" Value="12.5" />
-            <Setter Property="Foreground" Value="{DynamicResource JumboText}" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Root" Background="{TemplateBinding Background}" CornerRadius="9"
+                            Padding="0,18" TextElement.Foreground="{TemplateBinding Foreground}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="#1A3040" />
+            </Style>
+            <Style Selector="^:selected">
+                <Setter Property="Background" Value="{DynamicResource JumboAccent}" />
+                <Setter Property="Foreground" Value="#04121B" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="ViewTabList" TargetType="ListBox" BasedOn="{StaticResource JumboListBase}">
+            <Setter Property="ItemContainerTheme" Value="{StaticResource ViewTabItem}" />
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="8" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </ControlTheme>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <!-- 数值文本 -->
+        <Style Selector="TextBlock.num">
+            <Setter Property="FontFamily" Value="Consolas, Menlo, monospace" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource JumboGreen}" />
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+    <Grid RowDefinitions="Auto,*" RowSpacing="8">
 
         <!-- ================= 页头 ================= -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-            <StackPanel Spacing="3">
-                <TextBlock Classes="page-title" Text="钻孔控制" />
-                <TextBlock Classes="sub" Text="单臂自动钻孔 · 工步联锁 · 防碰撞保护已启用" />
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock Classes="page-title" Text="钻孔" />
+                <Border Classes="tag info"><TextBlock Text="{Binding SelectedViewText}" /></Border>
+                <Border Classes="tag"><TextBlock Text="{Binding DatasetText}" /></Border>
+                <Border Classes="tag ok"><TextBlock Text="{Binding DoneProgressText}" /></Border>
+                <Border Classes="tag warn" IsVisible="{Binding IsManualPlanning}">
+                    <TextBlock Text="手动规划中" />
+                </Border>
             </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Border Classes="tag warn"><TextBlock Text="{Binding AutoStateText}" /></Border>
-                <Border Classes="tag ok"><TextBlock Text="水压联锁 OK" /></Border>
-                <Border Classes="tag ok"><TextBlock Text="夹钎保护 OK" /></Border>
-            </StackPanel>
+            <TextBlock Grid.Column="1" Classes="dim" Text="{Binding StatusText}"
+                       VerticalAlignment="Center" Margin="14,0" MaxLines="1" TextTrimming="CharacterEllipsis" />
+            <Border Grid.Column="2" Classes="tag"><TextBlock Text="{Binding SelectedHoleText}" /></Border>
         </Grid>
 
-        <Grid Grid.Row="1" ColumnDefinitions="292,*,300" ColumnSpacing="12">
+        <Grid Grid.Row="1" ColumnDefinitions="96,*,336" ColumnSpacing="10">
 
-            <!-- ================= 左：臂架 ================= -->
-            <StackPanel Grid.Column="0" Spacing="12">
-                <Border Classes="card">
-                    <StackPanel Spacing="10">
-                        <TextBlock Classes="card-title" Text="执行臂架" />
-                        <ListBox Theme="{StaticResource JumboPillList}"
-                                 ItemsSource="{Binding BoomOptions}"
-                                 SelectedIndex="{Binding SelectedBoomIndex, Mode=TwoWay}" />
-                        <Border Classes="hr" />
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Classes="k" Text="掌子面距离" />
-                            <TextBlock Classes="v" Text="3.86 m" />
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Classes="k" Text="定位偏差 X" />
-                            <TextBlock Classes="v" Text="+0.012 m" />
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Classes="k" Text="定位偏差 Y" />
-                            <TextBlock Classes="v" Text="-0.008 m" />
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Classes="k" Text="对孔方式" />
-                            <TextBlock Classes="v" Text="激光 + 角度闭环" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
+            <!-- ================= 视图切换 ================= -->
+            <ListBox Grid.Column="0" Theme="{StaticResource ViewTabList}" VerticalAlignment="Stretch"
+                     ItemsSource="{Binding Views}"
+                     SelectedIndex="{Binding ViewModeIndex, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ViewModeOptionVm">
+                        <TextBlock Text="{Binding Header}" FontSize="15" HorizontalAlignment="Center" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
-                <Border Classes="card">
-                    <StackPanel Spacing="9">
-                        <TextBlock Classes="card-title" Text="臂架姿态" />
-                        <ItemsControl ItemsSource="{Binding Axes}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:AxisVm">
-                                    <Grid ColumnDefinitions="68,*,62" Margin="0,5,0,0">
-                                        <TextBlock Text="{Binding Label}" FontSize="13.5"
-                                                   Foreground="{DynamicResource JumboSub}" VerticalAlignment="Center" />
-                                        <myControls:LevelBar Grid.Column="1" Height="6" Margin="0,0,8,0"
-                                                             Value="{Binding Percent}" Maximum="100"
-                                                             FillBrush="{Binding Brush}" VerticalAlignment="Center" />
-                                        <TextBlock Grid.Column="2" Text="{Binding ValueText}" FontSize="13"
-                                                   FontFamily="Consolas, Menlo, monospace"
-                                                   Foreground="{DynamicResource JumboText}"
-                                                   HorizontalAlignment="Right" VerticalAlignment="Center" />
+            <!-- ================= 中：双臂作业条 + 掌子面图 ================= -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="8">
+
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding Arms}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="2" ColumnSpacing="8" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DrillArmVm">
+                            <Border Classes="card" Padding="12,10">
+                                <StackPanel Spacing="8">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="Bold"
+                                                   Foreground="{Binding Accent}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding PlanDepthText}" Classes="sub"
+                                                   VerticalAlignment="Center" Margin="12,0,0,0" />
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+                                            <Button Theme="{StaticResource JumboButton}" Content="−" Padding="9,2"
+                                                    FontSize="14" Command="{Binding StepDepthCommand}" CommandParameter="-0.25" />
+                                            <Button Theme="{StaticResource JumboButton}" Content="+" Padding="9,2"
+                                                    FontSize="14" Command="{Binding StepDepthCommand}" CommandParameter="0.25" />
+                                        </StackPanel>
                                     </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <TextBlock Text="{Binding DepthText}" FontSize="15" FontWeight="SemiBold"
+                                                   FontFamily="Consolas, Menlo, monospace"
+                                                   Foreground="{Binding Accent}" VerticalAlignment="Center"
+                                                   Margin="0,0,10,0" MinWidth="52" />
+                                        <myControls:LevelBar Grid.Column="1" Height="10" VerticalAlignment="Center"
+                                                             Value="{Binding DepthPercent}" Maximum="100"
+                                                             FillBrush="{Binding Accent}" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Classes="dim" Text="{Binding StateText}" FontSize="11.5" />
+                                        <TextBlock Grid.Column="1" Classes="dim" FontSize="11.5"
+                                                   Text="{Binding CurrentHole.NoText, StringFormat='当前孔 No.{0}'}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-                <Border Classes="card flat">
-                    <StackPanel Spacing="6">
-                        <TextBlock Classes="card-title" Text="作业提示" />
-                        <TextBlock Classes="dim" TextWrapping="Wrap"
-                                   Text="推进压力超过 12 MPa 或回转压力波动 &gt; ±1.5 MPa 时，系统自动降速并提示夹钎风险。" />
-                    </StackPanel>
-                </Border>
-            </StackPanel>
+                <!-- 掌子面图（四视图投影） -->
+                <Border Grid.Row="1" Classes="card" Padding="5">
+                    <Grid>
+                        <myControls:HoleSceneCanvas
+                            Section="{Binding Section}"
+                            Holes="{Binding DisplayHoles}"
+                            ViewMode="{Binding ViewMode}"
+                            CurrentHole="{Binding CurrentHole}"
+                            SelectedHole="{Binding SelectedHole, Mode=TwoWay}"
+                            ArmMarks="{Binding ArmMarks}"
+                            LeftInfoText="{Binding LeftInfoText}"
+                            RightInfoText="{Binding RightInfoText}"
+                            Revision="{Binding CanvasRevision}" />
 
-            <!-- ================= 中：当前钻孔 ================= -->
-            <Border Grid.Column="1" Classes="card">
-                <Grid RowDefinitions="Auto,Auto,Auto,*">
+                        <!-- 弹出面板：常用数据 / 钻机参数 / 钻孔模式 -->
+                        <Border IsVisible="{Binding IsPanelOpen}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Width="520" Background="#E60E1720" CornerRadius="12"
+                                BorderBrush="{DynamicResource JumboAccentDeep}" BorderThickness="1"
+                                BoxShadow="0 0 40 0 #88040A0E" Padding="16">
+                            <StackPanel Spacing="10">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="{Binding PanelTitle}" FontSize="16" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource JumboText}" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="关闭"
+                                            Padding="12,4" FontSize="12.5" Command="{Binding ClosePanelCommand}" />
+                                </Grid>
+                                <Border Classes="hr" Margin="0,0,0,4" />
+                                <ItemsControl ItemsSource="{Binding PanelRows}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:InfoRowVm">
+                                            <Grid ColumnDefinitions="120,*,Auto" Margin="0,4">
+                                                <TextBlock Text="{Binding Label}" FontSize="13"
+                                                           Foreground="{DynamicResource JumboSub}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="13.5"
+                                                           FontFamily="Consolas, Menlo, monospace"
+                                                           Foreground="{DynamicResource JumboText}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Note}" FontSize="11.5"
+                                                           Foreground="{DynamicResource JumboDim}" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                    <Grid ColumnDefinitions="*,Auto">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Classes="card-title" Text="当前钻孔" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding HoleNoText}" FontSize="18" FontWeight="Bold"
-                                       FontFamily="Consolas, Menlo, monospace"
-                                       Foreground="{DynamicResource JumboAccent}" VerticalAlignment="Center" />
-                            <Border Classes="tag info"><TextBlock Text="{Binding HoleTypeText}" /></Border>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                            <Border Classes="tag"><TextBlock Text="自动模式" /></Border>
-                            <Border Classes="tag warn"><TextBlock Text="钻入中" /></Border>
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- 孔深环 + 关键数据 -->
-                    <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,14,0,0">
-                        <Grid Width="152" Height="152">
-                            <myControls:CircleProgress Width="152" Height="152" StrokeThickness="12"
-                                                       Value="{Binding DepthPercent}"
-                                                       ShowProgressText="False"
-                                                       Foreground="{DynamicResource JumboAccent}"
-                                                       BackgroundRing="{DynamicResource JumboTrack}"
-                                                       TextColor="{DynamicResource JumboText}" />
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="0"
-                                        Margin="0,26,0,0">
-                                <TextBlock Text="孔深" FontSize="13" Foreground="{DynamicResource JumboDim}"
-                                           HorizontalAlignment="Center" />
-                                <TextBlock Text="{Binding DepthText}" FontSize="27" FontWeight="Bold"
-                                           FontFamily="Consolas, Menlo, monospace"
-                                           Foreground="{DynamicResource JumboText}" HorizontalAlignment="Center" />
-                                <TextBlock Text="m" FontSize="13" Foreground="{DynamicResource JumboDim}"
-                                           HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Grid>
-
-                        <Grid Grid.Column="1" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="22,6,0,0"
-                              ColumnSpacing="16" RowSpacing="16">
-                            <StackPanel Spacing="3">
-                                <TextBlock Classes="dim" Text="设计孔深" />
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="{Binding PlanDepthText}" FontSize="21" FontWeight="SemiBold"
-                                               FontFamily="Consolas, Menlo, monospace"
-                                               Foreground="{DynamicResource JumboText}" />
-                                    <TextBlock Text="m" FontSize="13" Foreground="{DynamicResource JumboDim}"
-                                               VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                                <StackPanel Spacing="8" IsVisible="{Binding IsModePanel}">
+                                    <Border Classes="hr" Margin="0,2" />
+                                    <TextBlock Classes="card-title" Text="作业模式" />
+                                    <ListBox Theme="{StaticResource JumboPillList}"
+                                             ItemsSource="{Binding DrillModes}"
+                                             SelectedIndex="{Binding DrillModeIndex, Mode=TwoWay}" />
                                 </StackPanel>
                             </StackPanel>
-                            <StackPanel Grid.Column="1" Spacing="3">
-                                <TextBlock Classes="dim" Text="已用时间" />
-                                <TextBlock Text="{Binding ElapsedText}" FontSize="21" FontWeight="SemiBold"
-                                           FontFamily="Consolas, Menlo, monospace"
-                                           Foreground="{DynamicResource JumboText}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="1" Spacing="3">
-                                <TextBlock Classes="dim" Text="预计剩余" />
-                                <TextBlock Text="{Binding RemainText}" FontSize="21" FontWeight="SemiBold"
-                                           FontFamily="Consolas, Menlo, monospace"
-                                           Foreground="{DynamicResource JumboGreen}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="3">
-                                <TextBlock Classes="dim" Text="钻具编号" />
-                                <TextBlock Text="T38-R32 / #07" FontSize="17" FontWeight="SemiBold"
-                                           Foreground="{DynamicResource JumboText}" />
-                            </StackPanel>
-                        </Grid>
+                        </Border>
                     </Grid>
+                </Border>
+            </Grid>
 
-                    <!-- 工步流程 -->
-                    <Border Grid.Row="2" Background="#0B151D" CornerRadius="10" Padding="12,10" Margin="0,12,0,0">
-                        <ItemsControl ItemsSource="{Binding Steps}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Columns="6" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:StepVm">
-                                    <StackPanel Spacing="6" HorizontalAlignment="Center">
-                                        <Grid Width="26" Height="26">
-                                            <Ellipse Fill="{Binding Brush}" Opacity="0.9" />
-                                            <TextBlock Text="{Binding Index}" FontSize="13" FontWeight="Bold"
-                                                       Foreground="#06121A" HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center" />
-                                        </Grid>
-                                        <TextBlock Text="{Binding Name}" FontSize="13"
-                                                   Foreground="{DynamicResource JumboSub}" HorizontalAlignment="Center" />
-                                        <TextBlock Text="{Binding StateText}" FontSize="12"
-                                                   Foreground="{DynamicResource JumboDim}" HorizontalAlignment="Center" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+            <!-- ================= 右：规划 / 参数 / 单臂局部图 ================= -->
+            <Grid Grid.Column="2" ColumnDefinitions="*,104" ColumnSpacing="8">
+                <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="8">
+
+                    <!-- 臂别 / 已规划孔数 / 隐藏 -->
+                    <Border Grid.Row="0" Classes="card hi" Padding="10">
+                        <StackPanel Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <ListBox Theme="{StaticResource JumboPillList}"
+                                         ItemsSource="{Binding Arms}"
+                                         SelectedIndex="{Binding SelectedArmIndex, Mode=TwoWay}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:DrillArmVm">
+                                            <TextBlock Text="{Binding Name}" FontSize="14" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <Button Grid.Column="1" Theme="{StaticResource JumboButton}"
+                                        Content="{Binding HideText}" FontSize="13" Padding="12,6"
+                                        Command="{Binding ToggleHideCommand}" />
+                            </Grid>
+                            <TextBlock Classes="sub" Text="{Binding PlannedText}" />
+                        </StackPanel>
                     </Border>
 
-                    <!-- 钻进参数 -->
-                    <StackPanel Grid.Row="3" Spacing="10" Margin="0,14,0,0">
-                        <ItemsControl ItemsSource="{Binding Params}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" Rows="2" ColumnSpacing="10" RowSpacing="10" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:MetricVm">
-                                <Border Background="#101C25" BorderBrush="{DynamicResource JumboStroke}"
-                                        BorderThickness="1" CornerRadius="9" Padding="10,8">
-                                    <StackPanel Spacing="5">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <TextBlock Text="{Binding Label}" FontSize="14"
-                                                       Foreground="{DynamicResource JumboSub}" />
-                                            <TextBlock Grid.Column="1" Text="{Binding Unit}" FontSize="12"
-                                                       Foreground="{DynamicResource JumboDim}" />
-                                        </Grid>
-                                        <TextBlock Text="{Binding Display}" FontSize="21" FontWeight="Bold"
-                                                   FontFamily="Consolas, Menlo, monospace"
-                                                   Foreground="{DynamicResource JumboText}" />
-                                        <myControls:LevelBar Height="6"
-                                                             Value="{Binding Value}"
-                                                             Minimum="{Binding Minimum}"
-                                                             Maximum="{Binding Maximum}"
-                                                             Target="{Binding Target}"
-                                                             FillBrush="{Binding Brush}" />
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Classes="card-title" Text="本循环已完成孔" VerticalAlignment="Center" />
-                                <Border Classes="tag"><TextBlock Text="最近 3 孔" /></Border>
-                            </StackPanel>
-                            <TextBlock Grid.Column="1" Classes="dim" Text="平均单孔 1 min 08 s"
-                                       VerticalAlignment="Center" />
+                    <!-- 规划 / 执行按钮 -->
+                    <Border Grid.Row="1" Classes="card" Padding="10">
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto"
+                              ColumnSpacing="8" RowSpacing="8">
+                            <Button Theme="{StaticResource JumboButton}" HorizontalAlignment="Stretch"
+                                    Padding="0,9" Content="{Binding ClearArmText}"
+                                    Command="{Binding ClearArmCommand}" />
+                            <Button Grid.Column="1" Theme="{StaticResource JumboButton}"
+                                    HorizontalAlignment="Stretch" Padding="0,9" Content="清除上一孔"
+                                    Command="{Binding ClearLastHoleCommand}" />
+                            <Button Grid.Row="1" Theme="{StaticResource JumboPrimaryButton}"
+                                    HorizontalAlignment="Stretch" Padding="0,9" Content="自动规划"
+                                    Command="{Binding AutoPlanCommand}" />
+                            <Button Grid.Row="1" Grid.Column="1" Theme="{StaticResource JumboButton}"
+                                    HorizontalAlignment="Stretch" Padding="0,9"
+                                    Content="{Binding ManualPlanText}" Command="{Binding ManualPlanCommand}" />
+                            <Button Grid.Row="2" Theme="{StaticResource JumboButton}"
+                                    HorizontalAlignment="Stretch" Padding="0,9"
+                                    Content="{Binding ExecuteArmText}" Command="{Binding ExecuteArmCommand}" />
+                            <Button Grid.Row="2" Grid.Column="1" Theme="{StaticResource JumboDangerButton}"
+                                    HorizontalAlignment="Stretch" Padding="0,9" Content="停　止"
+                                    Command="{Binding StopArmCommand}" />
+                            <Button Grid.Row="3" Grid.ColumnSpan="2" Theme="{StaticResource JumboButton}"
+                                    HorizontalAlignment="Stretch" Padding="0,9" Content="清除已钻完成孔"
+                                    Command="{Binding ClearDoneHolesCommand}" />
                         </Grid>
+                    </Border>
 
-                        <Border Background="#0B151D" CornerRadius="8" Padding="12,6">
-                            <Grid ColumnDefinitions="70,*,*,88" Margin="0,4">
-                                <TextBlock Classes="dim" Text="孔号" />
-                                <TextBlock Grid.Column="1" Classes="dim" Text="孔深" />
-                                <TextBlock Grid.Column="2" Classes="dim" Text="耗时" />
-                                <TextBlock Grid.Column="3" Classes="dim" Text="结果" HorizontalAlignment="Right" />
+                    <!-- 双臂参数表 -->
+                    <Border Grid.Row="2" Classes="card" Padding="10">
+                        <StackPanel Spacing="4">
+                            <Grid ColumnDefinitions="*,64,64,50" Margin="0,0,0,4">
+                                <TextBlock Classes="dim" Text="实时参数" />
+                                <TextBlock Grid.Column="1" Classes="dim" Text="左臂" HorizontalAlignment="Right" />
+                                <TextBlock Grid.Column="2" Classes="dim" Text="右臂" HorizontalAlignment="Right" />
+                                <TextBlock Grid.Column="3" Classes="dim" Text="单位" HorizontalAlignment="Right" />
                             </Grid>
-                        </Border>
+                            <ItemsControl ItemsSource="{Binding ParamRows}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:DrillParamRowVm">
+                                        <Grid ColumnDefinitions="*,64,64,50" Margin="0,3">
+                                            <TextBlock Text="{Binding Label}" FontSize="13"
+                                                       Foreground="{DynamicResource JumboSub}"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding LeftText}" Classes="num"
+                                                       HorizontalAlignment="Right" />
+                                            <TextBlock Grid.Column="2" Text="{Binding RightText}" Classes="num"
+                                                       HorizontalAlignment="Right" />
+                                            <TextBlock Grid.Column="3" Text="{Binding Unit}" FontSize="11"
+                                                       Foreground="{DynamicResource JumboDim}"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
 
-                        <ItemsControl ItemsSource="{Binding RecentHoles}" Margin="12,0">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:DrillRecordVm">
-                                    <Grid ColumnDefinitions="70,*,*,88" Margin="0,5,0,5">
-                                        <TextBlock Text="{Binding No}" FontSize="14"
-                                                   FontFamily="Consolas, Menlo, monospace"
-                                                   Foreground="{DynamicResource JumboText}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Depth}" FontSize="14"
-                                                   FontFamily="Consolas, Menlo, monospace"
-                                                   Foreground="{DynamicResource JumboSub}" />
-                                        <TextBlock Grid.Column="2" Text="{Binding Duration}" FontSize="14"
-                                                   FontFamily="Consolas, Menlo, monospace"
-                                                   Foreground="{DynamicResource JumboSub}" />
-                                        <TextBlock Grid.Column="3" Text="{Binding Result}" FontSize="14"
-                                                   Foreground="{Binding Brush}" HorizontalAlignment="Right" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                    <!-- 单臂局部图（对应现场 HMI 右下角的“左 / 右”视图） -->
+                    <Border Grid.Row="3" Classes="card" Padding="4" MinHeight="160">
+                        <myControls:HoleSceneCanvas
+                            Section="{Binding Section}"
+                            Holes="{Binding LocalHoles}"
+                            ViewMode="{Binding ViewMode}"
+                            CurrentHole="{Binding SelectedArm.CurrentHole}"
+                            Caption="{Binding LocalCaption}"
+                            ShowDimensions="False"
+                            ShowHoleLabels="False"
+                            Revision="{Binding CanvasRevision}" />
+                    </Border>
+
+                    <TextBlock Grid.Row="4" Classes="dim" FontSize="11.5" TextWrapping="Wrap"
+                               Text="规划：自动规划按「底板 → 周边 → 分层蛇形」分臂排序；手动规划时在图上依次点选炮孔即可入队。" />
                 </Grid>
-            </Border>
 
-            <!-- ================= 右：控制 / 联锁 ================= -->
-            <StackPanel Grid.Column="2" Spacing="12">
-                <Border Classes="card">
-                    <StackPanel Spacing="9">
-                        <TextBlock Classes="card-title" Text="操作控制" />
-                        <Button Theme="{StaticResource JumboPrimaryButton}" HorizontalAlignment="Stretch"
-                                Content="{Binding RunButtonText}"
-                                Command="{Binding ToggleRunCommand}" />
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button Grid.Column="0" Theme="{StaticResource JumboButton}" Content="手动退钎"
-                                    HorizontalAlignment="Stretch" />
-                            <Button Grid.Column="1" Theme="{StaticResource JumboButton}" Content="单步点动"
-                                    HorizontalAlignment="Stretch" />
-                        </Grid>
-                        <Button Theme="{StaticResource JumboButton}" Content="重置工步" HorizontalAlignment="Stretch" />
-                        <Border Classes="hr" />
-                        <Button Theme="{StaticResource JumboDangerButton}" Content="急　停" HorizontalAlignment="Stretch"
-                                FontSize="17" FontWeight="Bold" Padding="0,12"
-                                Command="{Binding EmergencyStopCommand}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Classes="card">
-                    <StackPanel Spacing="9">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Classes="card-title" Text="联锁与保护" VerticalAlignment="Center" />
-                            <Border Grid.Column="1" Classes="tag ok"><TextBlock Text="全部正常" /></Border>
-                        </Grid>
-                        <ItemsControl ItemsSource="{Binding Interlocks}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:SignalVm">
-                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,5,0,5">
-                                        <Ellipse Width="6" Height="6" Fill="{Binding Brush}" VerticalAlignment="Center" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="14"
-                                                   Foreground="{DynamicResource JumboSub}"
-                                                   Margin="8,0,0,0" VerticalAlignment="Center" />
-                                        <TextBlock Grid.Column="2" Text="{Binding ValueText}" FontSize="13.5"
-                                                   FontFamily="Consolas, Menlo, monospace"
-                                                   Foreground="{DynamicResource JumboText}" VerticalAlignment="Center" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
-
-                <Border Classes="card flat">
-                    <StackPanel Spacing="6">
-                        <TextBlock Classes="card-title" Text="钻具寿命" />
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
-                            <TextBlock Classes="dim" Text="累计钻进" />
-                            <TextBlock Grid.Column="1" Text="1 284 m" FontSize="14"
-                                       Foreground="{DynamicResource JumboText}" />
-                        </Grid>
-                        <myControls:LevelBar Height="6" Value="64" Maximum="100"
-                                             FillBrush="{DynamicResource JumboAmber}" />
-                        <TextBlock Classes="dim" Text="建议剩余 320 m 后更换钎头" />
-                    </StackPanel>
-                </Border>
-            </StackPanel>
+                <!-- 右侧竖排：常用数据 / 钻机参数 / 钻孔模式 / 自动凿岩 / 急停 -->
+                <StackPanel Grid.Column="1" Spacing="8">
+                    <Button Theme="{StaticResource JumboButton}" Content="常用数据" Padding="0,16"
+                            Command="{Binding OpenPanelCommand}" CommandParameter="common" />
+                    <Button Theme="{StaticResource JumboButton}" Content="钻机参数" Padding="0,16"
+                            Command="{Binding OpenPanelCommand}" CommandParameter="machine" />
+                    <Button Theme="{StaticResource JumboButton}" Content="钻孔模式" Padding="0,16"
+                            Command="{Binding OpenPanelCommand}" CommandParameter="mode" />
+                    <Button Theme="{StaticResource JumboPrimaryButton}" Content="{Binding AutoDrillText}"
+                            Padding="0,18" FontSize="14.5" Command="{Binding ToggleAutoDrillCommand}" />
+                    <Button Theme="{StaticResource JumboDangerButton}" Content="急　停" Padding="0,18"
+                            FontSize="16" FontWeight="Bold" Command="{Binding EmergencyStopCommand}" />
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

@@ -86,3 +86,16 @@ public partial class SignalVm : ObservableObject
     [ObservableProperty] private string _state = "正常";
     [ObservableProperty] private IBrush _brush = Brushes.LimeGreen;
 }
+
+/// <summary>
+/// 画布上的“臂架当前位置”标记（现场 HMI 上的黄色十字准星）。
+/// 坐标为掌子面米制坐标：X 横向、Y 竖向、Axial 进深。
+/// </summary>
+public sealed class ArmMarkVm
+{
+    public string Label { get; init; } = string.Empty;
+    public double X { get; init; }
+    public double Y { get; init; }
+    public double Axial { get; init; }
+    public IBrush Brush { get; init; } = Brushes.Gold;
+}

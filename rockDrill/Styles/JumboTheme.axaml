@@ -211,6 +211,7 @@
                     <Border Name="Root" Background="{TemplateBinding Background}" CornerRadius="9"
                             Padding="18,7" TextElement.Foreground="{TemplateBinding Foreground}">
                         <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
                                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                     </Border>
                 </ControlTemplate>
@@ -242,6 +243,7 @@
                     <Border Name="Root" Background="{TemplateBinding Background}" CornerRadius="8"
                             Padding="11,6" TextElement.Foreground="{TemplateBinding Foreground}">
                         <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
                                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                     </Border>
                 </ControlTemplate>
